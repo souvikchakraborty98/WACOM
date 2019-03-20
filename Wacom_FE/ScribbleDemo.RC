@@ -1,0 +1,108 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+/////////////////////////////////////////////////////////////////////////////
+// English (India) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENN)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_INDIA
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+SCRIBBLEDEMOMENU MENU
+BEGIN
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Wacom Feature Extractor...", IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+ABOUTBOX DIALOGEX 22, 17, 161, 75
+
+CAPTION "About Wacom Feature Extractor"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CTEXT           "LCS/Telegraphics",-1,0,3,161,8
+    CTEXT           "Modified By Souvik Chakraborty",-1,0,12,161,8
+    CTEXT           "Wacom Feature Extractor",-1,0,28,161,8
+    CTEXT           "Version 2.0",-1,0,41,161,8
+    DEFPUSHBUTTON   "OK",IDOK,65,57,32,14
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    "ABOUTBOX", DIALOG
+    BEGIN
+        TOPMARGIN, 3
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (India) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
