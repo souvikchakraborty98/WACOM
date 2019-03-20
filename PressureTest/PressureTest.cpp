@@ -200,6 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TCHAR text2[10]= { '\0' };
 	std::ofstream myfile1;
 	std::ofstream myfile;
+	COLORREF c;
 	
 
 	switch (message)
@@ -262,14 +263,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 
 			_stprintf(text2, _T("%d"), prsNew);
+			c = RGB(255, 0, 0);
+			SetPixel(hdc, xMousePos, yMousePos, c);
+			
+			
+			TextOut(hdc, 100, 20, text2, ARRAYSIZE(text2));
+			EndPaint(hWnd, &psPaint);
 			myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv");
 			myfile << "Pressure Data\n";
 			myfile << text2;
 			myfile << ",\n";
 			myfile.close();
-			
-			TextOut(hdc, 100, 20, text2, ARRAYSIZE(text2));
-			EndPaint(hWnd, &psPaint);
 			
 		}
 		break;
@@ -312,17 +316,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			_stprintf(text, _T("%d"), xMousePos);
 			_stprintf(text1, _T("%d"), yMousePos);
 			
+		
+			
+			TextOut(hdc, rcClient.left, rcClient.top, text, ARRAYSIZE(text));
+			TextOut(hdc, 100, 0, text1, ARRAYSIZE(text1));
+			EndPaint(hWnd, &psPaint);	
 			myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv");
-			myfile1 << "Pressure Data\n";
+			myfile1 << "Coordinate Data\n";
 			myfile1 << text;
 			myfile1 << ",";
 			myfile1 << text1;
 			myfile1 << ",\n";
 			myfile1.close();
-			
-			TextOut(hdc, rcClient.left, rcClient.top, text, ARRAYSIZE(text));
-			TextOut(hdc, 100, 0, text1, ARRAYSIZE(text1));
-			EndPaint(hWnd, &psPaint);		break;
+			break;
 
 	case WT_PACKET:
 		
