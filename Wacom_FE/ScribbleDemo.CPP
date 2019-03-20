@@ -1,6 +1,10 @@
 /*----------------------------------------------------------------------------s
 	NAME
 		ScribbleDemo.cpp
+		Modified to work for Wacom Featture Extractor App
+		By Souvik Chakraborty
+
+        Please do not remove auto-generated/informative comments
 ---------------------------------------------------------------------------- */
 
 #include <windows.h>
@@ -172,7 +176,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	/* Make the window visible; update its client area; and return "success" */
 
-	ShowWindow(hWnd, nCmdShow);
+	ShowWindow(hWnd, SW_SHOWMAXIMIZED);
+	//ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	return (TRUE);
 
@@ -345,7 +350,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 			// Initialize a Wintab context for each connected tablet.
 			if ( !OpenTabletContexts(hWnd) )
 			{
-				ShowError("Oops! No tablets attached.");
+				ShowError("Oops! No tablets attached. Please plug in device!");
 				SendMessage(hWnd, WM_DESTROY, 0, 0L);
 			}
 			break;
