@@ -265,6 +265,8 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 
 			// In Wintab, the tablet origin is lower left.  Move origin to upper left
 			// so that it coincides with screen origin.
+			//Also to remember that this is not the case with MS Excel
+			// In Excel everything will be inverted
 			lcMine.lcOutExtY = -GetSystemMetrics( SM_CYVIRTUALSCREEN );
 
 			// Leave the system origin and extents as received:
@@ -284,7 +286,7 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 					case PenColorGreen:	penColor = RGB(0,255,0);	gNextPenColor = PenColorBlue; break;
 					case PenColorBlue:	penColor = RGB(0,0,255);	gNextPenColor = PenColorRed; break;
 					default:
-						WACOM_ASSERT( !"Bad ben color" );
+						WACOM_ASSERT( !"Bad pen color" );
 				}
 
 				TabletInfo info = { Pressure.axMax, penColor };
@@ -412,8 +414,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 				myfile1 << text1;
 				myfile1 << ",\n";
 				myfile1.close();
-
-//				WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
+		
+				//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
 			break;
 
 		case WT_PACKET:
@@ -588,10 +590,6 @@ BOOL FAR PASCAL About(HWND hDlg, unsigned message, WPARAM wParam, LPARAM lParam)
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Purpose
-//		Release resources we used in this example.
-//
 void Cleanup( void )
 {
 	WACOM_TRACE( "Cleanup()\n" );
