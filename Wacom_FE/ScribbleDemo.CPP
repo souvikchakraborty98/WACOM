@@ -2,7 +2,7 @@
 	NAME
 		ScribbleDemo.cpp
 		Modified to work for Wacom Featture Extractor App
-		By Souvik Chakraborty
+		By Souvik Chakraborty,2019
 
         Please do not remove auto-generated/informative comments
 ---------------------------------------------------------------------------- */
@@ -18,7 +18,13 @@
 #include "ScribbleDemo.h"
 #include <vector>
 #include <map>
+#include <tchar.h>
 #include <sstream>
+#include <iostream>
+#include <fstream>
+using namespace std;
+std::ofstream myfile1;
+std::ofstream myfile;
 
 HINSTANCE hInst = NULL;
 
@@ -166,6 +172,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		NULL
 	);
 
+
 	/* If window could not be created, return "failure" */
 
 	if (!hWnd)
@@ -173,6 +180,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		ShowError( "Could not create window!");
 		return (FALSE);
 	}
+	myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
+	myfile << "Pressure Data\n";
+	myfile.close();
+	myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
+	myfile1 << "Coordinate Data\n";
+	myfile1.close();
+
 
 	/* Make the window visible; update its client area; and return "success" */
 
@@ -343,6 +357,17 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 	LRESULT lResult = 0L;
 	static int xMousePos = 0;
 	static int yMousePos = 0;
+	TCHAR text[5] = { '\0' };
+	TCHAR text1[5] = { '\0' };
+	TCHAR text2[10] = { '\0' };
+	
+
+	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
+	myfile << "Pressure Data\n";
+	myfile.close();
+	myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
+	myfile1 << "Coordinate Data\n";
+	myfile1.close();*/
 
 	switch (message) 
 	{
@@ -353,6 +378,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 				ShowError("Oops! No tablets attached. Please plug in device!");
 				SendMessage(hWnd, WM_DESTROY, 0, 0L);
 			}
+			
 			break;
 
 		case WM_MOVE:
@@ -376,6 +402,17 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 		case WM_MOUSEMOVE:
 				xMousePos = GET_X_LPARAM(lParam);
 				yMousePos = GET_Y_LPARAM(lParam);
+
+				_stprintf(text, _T("%d"), xMousePos);
+				_stprintf(text1, _T("%d"), yMousePos);
+
+				myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
+				myfile1 << text;
+				myfile1 << ",";
+				myfile1 << text1;
+				myfile1 << ",\n";
+				myfile1.close();
+
 //				WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
 			break;
 
@@ -396,6 +433,12 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 					ptNew.y = pkt.pkY;
 
 					prsNew = pkt.pkNormalPressure;
+
+					_stprintf(text2, _T("%d"), prsNew);
+					myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
+					myfile << text2;
+					myfile << ",\n";
+					myfile.close();
 
 					if (ptNew.x != ptOld.x ||
 						 ptNew.y != ptOld.y ||
