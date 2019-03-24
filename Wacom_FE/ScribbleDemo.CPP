@@ -23,8 +23,8 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-std::ofstream myfile1;
 std::ofstream myfile;
+//std::ofstream myfile;
 
 HINSTANCE hInst = NULL;
 
@@ -144,14 +144,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	if ( !LoadWintab( ) )
 	{
-		ShowError( "Wintab not available" );
+		ShowError( "Wintab not available. Probable fix: Install Drivers" );
 		return FALSE;
 	}
 
 	/* check if WinTab available. */
 	if (!gpWTInfoA(0, 0, NULL)) 
 	{
-		ShowError( "WinTab Services Not Available." );
+		ShowError( "WinTab Services Not Available. Probable fix: Install Drivers" );
 		return FALSE;
 	}
 
@@ -180,12 +180,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		ShowError( "Could not create window!");
 		return (FALSE);
 	}
-	myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
-	myfile << "Pressure Data\n";
+	myfile.open("data.csv");
+	myfile << "Coordinate Data: X";
+	myfile << " , ";
+	myfile << "Coordinate Data: Y";
+	myfile << " , ";
+	myfile << "Pressure Data";
+	myfile << " , ";
+	myfile << "\n";
 	myfile.close();
-	myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
-	myfile1 << "Coordinate Data\n";
-	myfile1.close();
+	//myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
+	//myfile1 << "Coordinate Data\n";
+	//myfile1.close();
 
 
 	/* Make the window visible; update its client area; and return "success" */
@@ -408,12 +414,12 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 				_stprintf(text, _T("%d"), xMousePos);
 				_stprintf(text1, _T("%d"), yMousePos);
 
-				myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
-				myfile1 << text;
-				myfile1 << ",";
-				myfile1 << text1;
-				myfile1 << ",\n";
-				myfile1.close();
+				myfile.open("data.csv", ios::app);
+				myfile << text;
+				myfile << ",";
+				myfile << text1;
+				myfile << ",";
+				myfile.close();
 		
 				//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
 			break;
@@ -427,6 +433,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 				if (gpWTPacket(hctx, wParam, &pkt))
 				{
 					//WacomTrace("Render point for hctx: 0x%X\n", hctx);
+					//For Debug...chap nebar nei
 
 					ptOld = ptNew;
 					prsOld = prsNew;
@@ -437,7 +444,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 					prsNew = pkt.pkNormalPressure;
 
 					_stprintf(text2, _T("%d"), prsNew);
-					myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
+					myfile.open("data.csv", ios::app);
 					myfile << text2;
 					myfile << ",\n";
 					myfile.close();
