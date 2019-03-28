@@ -3,8 +3,7 @@
 		ScribbleDemo.cpp
 		Modified to work for Wacom Featture Extractor App
 		By Souvik Chakraborty,2019
-
-        Please do not remove auto-generated/informative comments
+		Please do not remove auto-generated/informative comments
 ---------------------------------------------------------------------------- */
 
 #include <windows.h>
@@ -24,14 +23,16 @@
 #include <fstream>
 using namespace std;
 std::ofstream myfile;
-//std::ofstream myfile;
+std::ofstream myfile1;
+char myfilename[1000] = { '\0' };
+char myfile1name[1000] = { '\0' };
 
 HINSTANCE hInst = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hold tablet-specific properties used when responding to tablet data packets.
 //
-typedef struct 
+typedef struct
 {
 	int		maxPressure;
 	COLORREF	penColor;
@@ -77,8 +78,8 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MSG msg;
 
 	if (!hPrevInstance)
-	if (!InitApplication(hInstance))
-		return (FALSE);
+		if (!InitApplication(hInstance))
+			return (FALSE);
 
 	/* Perform initializations that apply to a specific instance */
 
@@ -120,7 +121,7 @@ BOOL InitApplication(HINSTANCE hInstance)
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_APPWORKSPACE + 1);
-	wc.lpszMenuName =  "ScribbleDemoMenu";
+	wc.lpszMenuName = "ScribbleDemoMenu";
 	wc.lpszClassName = "ScribbleDemoWClass";
 
 	/* Register the window class and return success/failure code. */
@@ -141,17 +142,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	/* many subsequence calls from this application to Windows.            */
 
 	hInst = hInstance;
+	ShowError("WACOM FEATURE EXTRACTOR UNDER DEVELOPMENT. PLEASE USE WITH DISCRETION");
 
-	if ( !LoadWintab( ) )
+	if (!LoadWintab())
 	{
-		ShowError( "Wintab not available. Probable fix: Install Drivers" );
+		ShowError("Wintab not available. Probable fix: Install Drivers");
 		return FALSE;
 	}
 
 	/* check if WinTab available. */
-	if (!gpWTInfoA(0, 0, NULL)) 
+	if (!gpWTInfoA(0, 0, NULL))
 	{
-		ShowError( "WinTab Services Not Available. Probable fix: Install Drivers" );
+		ShowError("WinTab Services Not Available. Probable fix: Install Drivers");
 		return FALSE;
 	}
 
@@ -177,18 +179,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	if (!hWnd)
 	{
-		ShowError( "Could not create window!");
+		ShowError("Could not create window!");
 		return (FALSE);
 	}
-	myfile.open("data.csv");
-	myfile << "Coordinate Data: X";
-	myfile << " , ";
-	myfile << "Coordinate Data: Y";
-	myfile << " , ";
-	myfile << "Pressure Data";
-	myfile << " , ";
-	myfile << "\n";
+	SYSTEMTIME lt;
+
+	GetLocalTime(&lt);
+	sprintf(myfilename, "Coordinate Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute,lt.wSecond,lt.wDay,lt.wMonth,lt.wYear);
+	sprintf(myfile1name, "Pressure Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
+	myfile.open(myfilename);
+	myfile << "Coordinate Data\n";
 	myfile.close();
+	myfile1.open(myfile1name);
+	myfile1 << "Pressure Data\n";
+	myfile1.close();
 	//myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
 	//myfile1 << "Coordinate Data\n";
 	//myfile1.close();
@@ -226,18 +230,18 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 	// will not always let you enumerate through all contexts.
 	do
 	{
-		LOGCONTEXT lcMine = {0};
+		LOGCONTEXT lcMine = { 0 };
 		UINT wWTInfoRetVal = 0;
-		AXIS TabletX = {0};
-		AXIS TabletY = {0};
+		AXIS TabletX = { 0 };
+		AXIS TabletY = { 0 };
 
-		AXIS Pressure = {0};
+		AXIS Pressure = { 0 };
 
 		WacomTrace("Getting info on contextIndex: %i ...\n", ctxIndex);
 
 		int foundCtx = gpWTInfoA(WTI_DDCTXS + ctxIndex, 0, &lcMine);
 
-		if ( foundCtx > 0 )
+		if (foundCtx > 0)
 		{
 			lcMine.lcPktData = PACKETDATA;
 			lcMine.lcOptions |= CXO_MESSAGES;
@@ -247,16 +251,16 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 			lcMine.lcBtnUpMask = lcMine.lcBtnDnMask;
 
 			// Set the entire tablet as active
-			wWTInfoRetVal = gpWTInfoA( WTI_DEVICES + ctxIndex, DVC_X, &TabletX );
-			if (  wWTInfoRetVal != sizeof( AXIS ) )
+			wWTInfoRetVal = gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_X, &TabletX);
+			if (wWTInfoRetVal != sizeof(AXIS))
 			{
 				WacomTrace("This context should not be opened.\n");
 				continue;
 			}
 
-			wWTInfoRetVal = gpWTInfoA( WTI_DEVICES + ctxIndex, DVC_Y, &TabletY );
+			wWTInfoRetVal = gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_Y, &TabletY);
 
-			gpWTInfoA( WTI_DEVICES + ctxIndex, DVC_NPRESSURE, &Pressure );
+			gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_NPRESSURE, &Pressure);
 			WacomTrace("Pressure: %i, %i\n", Pressure.axMin, Pressure.axMax);
 
 			lcMine.lcInOrgX = 0;
@@ -265,15 +269,15 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 			lcMine.lcInExtY = TabletY.axMax;
 
 			// Guarantee the output coordinate space to be in screen coordinates.  
-			lcMine.lcOutOrgX = GetSystemMetrics( SM_XVIRTUALSCREEN );
-			lcMine.lcOutOrgY = GetSystemMetrics( SM_YVIRTUALSCREEN );
-			lcMine.lcOutExtX = GetSystemMetrics( SM_CXVIRTUALSCREEN );
+			lcMine.lcOutOrgX = GetSystemMetrics(SM_XVIRTUALSCREEN);
+			lcMine.lcOutOrgY = GetSystemMetrics(SM_YVIRTUALSCREEN);
+			lcMine.lcOutExtX = GetSystemMetrics(SM_CXVIRTUALSCREEN);
 
 			// In Wintab, the tablet origin is lower left.  Move origin to upper left
 			// so that it coincides with screen origin.
 			//Also to remember that this is not the case with MS Excel
 			// In Excel everything will be inverted
-			lcMine.lcOutExtY = -GetSystemMetrics( SM_CYVIRTUALSCREEN );
+			lcMine.lcOutExtY = -GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
 			// Leave the system origin and extents as received:
 			// lcSysOrgX, lcSysOrgY, lcSysExtX, lcSysExtY
@@ -281,18 +285,18 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 			// Open the context enabled.
 			HCTX hCtx = gpWTOpenA(hWnd, &lcMine, TRUE);
 
-			if ( hCtx )
+			if (hCtx)
 			{
 				// Save context
 				COLORREF penColor = MAX_PEN_COLOR;
 
 				switch (gNextPenColor)
 				{
-					case PenColorRed:		penColor = RGB(255,0,0);	gNextPenColor = PenColorGreen; break;
-					case PenColorGreen:	penColor = RGB(0,255,0);	gNextPenColor = PenColorBlue; break;
-					case PenColorBlue:	penColor = RGB(0,0,255);	gNextPenColor = PenColorRed; break;
-					default:
-						WACOM_ASSERT( !"Bad pen color" );
+				case PenColorRed:		penColor = RGB(255, 0, 0);	gNextPenColor = PenColorGreen; break;
+				case PenColorGreen:	penColor = RGB(0, 255, 0);	gNextPenColor = PenColorBlue; break;
+				case PenColorBlue:	penColor = RGB(0, 0, 255);	gNextPenColor = PenColorRed; break;
+				default:
+					WACOM_ASSERT(!"Bad pen color");
 				}
 
 				TabletInfo info = { Pressure.axMax, penColor };
@@ -315,7 +319,7 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 		ctxIndex++;
 	} while (TRUE);
 
-	if ( gnOpenContexts < gnAttachedDevices )
+	if (gnOpenContexts < gnAttachedDevices)
 	{
 		ShowError("Oops - did not open a context for each attached device");
 	}
@@ -336,7 +340,7 @@ void CloseTabletContexts(void)
 {
 	// Close all contexts we opened so we don't have them lying around in prefs.
 	for (std::map<HCTX, TabletInfo>::iterator it = gContextMap.begin();
-			it != gContextMap.end(); ++it)
+		it != gContextMap.end(); ++it)
 	{
 		HCTX hCtx = it->first;
 		WacomTrace("Closing context: 0x%X\n", hCtx);
@@ -351,7 +355,7 @@ void CloseTabletContexts(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARAM lParam)
+LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARAM lParam)
 {
 	DLGPROC lpProcAbout;
 	static POINT ptOld, ptNew;
@@ -368,7 +372,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 	TCHAR text[5] = { '\0' };
 	TCHAR text1[5] = { '\0' };
 	TCHAR text2[10] = { '\0' };
-	
+
 
 	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
 	myfile << "Pressure Data\n";
@@ -377,145 +381,154 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 	myfile1 << "Coordinate Data\n";
 	myfile1.close();*/
 
-	switch (message) 
+	switch (message)
 	{
-		case WM_CREATE:
-			// Initialize a Wintab context for each connected tablet.
-			if ( !OpenTabletContexts(hWnd) )
-			{
-				ShowError("Oops! No tablets attached. Please plug in device!");
-				SendMessage(hWnd, WM_DESTROY, 0, 0L);
-			}
+	case WM_CREATE:
+		// Initialize a Wintab context for each connected tablet.
+		if (!OpenTabletContexts(hWnd))
+		{
+			ShowError("Oops! No tablets attached. Please plug in device!");
+			SendMessage(hWnd, WM_DESTROY, 0, 0L);
+		}
+
+		break;
+
+	case WM_MOVE:
+	case WM_SIZE:
+		GetClientRect(hWnd, &rcClient);
+		InvalidateRect(hWnd, NULL, TRUE);
+		break;
+
+	case WM_COMMAND:
+		if (GET_WM_COMMAND_ID(wParam, lParam) == IDM_ABOUT) {
+			lpProcAbout = MakeProcInstance(About, hInst);
+
+			DialogBox(hInst, "AboutBox", hWnd, lpProcAbout);
+
+			FreeProcInstance(lpProcAbout);
+		}
+		else
+			fHandled = FALSE;
+		break;
+
+	case WM_MOUSEMOVE:
+		xMousePos = GET_X_LPARAM(lParam);
+		yMousePos = GET_Y_LPARAM(lParam);
+		
+		_stprintf(text, _T("%d"), xMousePos);
+		_stprintf(text1, _T("%d"), yMousePos);
+		//if (xMousePos != tmp1 && yMousePos != tmp2)
+		//{
+			myfile.open(myfilename, ios::app);
+			myfile << text;
+			myfile << ",";
+			myfile << text1;
+			myfile << ",";
+			myfile << "\n";
+			myfile.close();
+		//}
+		//tmp1 = xMousePos;
+		//tmp2 = yMousePos;
+
+		//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
+		break;
+
+	case WT_PACKET:
+	{
+		hctx = (HCTX)lParam;
+
+		// Wintab X/Y data is in screen coordinates. These will have to
+		// be converted to client coordinates in the WM_PAINT handler.
+		if (gpWTPacket(hctx, wParam, &pkt))
+		{
+			//WacomTrace("Render point for hctx: 0x%X\n", hctx);
+			//For Debug...chap nebar nei
+
+			ptOld = ptNew;
+			prsOld = prsNew;
+
+			ptNew.x = pkt.pkX;
+			ptNew.y = pkt.pkY;
+
+			prsNew = pkt.pkNormalPressure;
+
+			_stprintf(text2, _T("%d"), prsNew);
+			//if (ptmp != prsNew)
+			//{
+				myfile1.open(myfile1name, ios::app);
+				myfile1 << text2;
+				myfile1 << ",";
+				myfile1 << "\n";
+				myfile1.close();
+			//}
 			
-			break;
+			if (ptNew.x != ptOld.x ||
+				ptNew.y != ptOld.y ||
+				prsNew != prsOld)
+			{
+				InvalidateRect(hWnd, NULL, FALSE);
+			}
+		}
+		else
+		{
+			WacomTrace("Oops - got pinged by an unknown context: 0x%X", hctx);
+		}
+	}
+	break;
 
-		case WM_MOVE:
-		case WM_SIZE:
-			GetClientRect(hWnd, &rcClient);
-			InvalidateRect(hWnd, NULL, TRUE);
-			break;
+	case WT_INFOCHANGE:
+	{
+		int nAttachedDevices = 0;
+		gpWTInfoA(WTI_INTERFACE, IFC_NDEVICES, &nAttachedDevices);
 
-		case WM_COMMAND:
-			if (GET_WM_COMMAND_ID(wParam, lParam) == IDM_ABOUT) {
-				lpProcAbout = MakeProcInstance(About, hInst);
+		WacomTrace("WT_INFOCHANGE detected; number of connected tablets is now: %i\n", nAttachedDevices);
 
-				DialogBox(hInst, "AboutBox", hWnd, lpProcAbout);
+		if (nAttachedDevices != gnAttachedDevices)
+		{
+			// kill all current tablet contexts
+			CloseTabletContexts();
 
-				FreeProcInstance(lpProcAbout);
+			// Add some delay to give driver a chance to catch up in configuring
+			// to the current attached tablets.  
+			// 1 second seems to work - your mileage may vary...
+			::Sleep(1000);
+
+			// re-enumerate attached tablets
+			OpenTabletContexts(hWnd);
+		}
+
+		if (gnAttachedDevices == 0)
+		{
+			ShowError("No tablets found.");
+			SendMessage(hWnd, WM_DESTROY, 0, 0L);
+		}
+	}
+	break;
+
+	case WT_PROXIMITY:
+	{
+		hctx = (HCTX)wParam;
+
+		bool entering = (HIWORD(lParam) != 0);
+
+		if (entering)
+		{
+			if (gContextMap.count(hctx) > 0)
+			{
+				TabletInfo info = gContextMap[hctx];
+
+				std::stringstream szTitle;	szTitle.flush();
+				szTitle << gpszProgramName << "; #tablet(s) attached: " << gnAttachedDevices << "; drawing on: " << info.name;
+				WacomTrace("Tablet name: %s\n", szTitle.str().c_str());
+				SetWindowText(hWnd, szTitle.str().c_str());
 			}
 			else
-				fHandled = FALSE;
-			break;
-
-		case WM_MOUSEMOVE:
-				xMousePos = GET_X_LPARAM(lParam);
-				yMousePos = GET_Y_LPARAM(lParam);
-
-				_stprintf(text, _T("%d"), xMousePos);
-				_stprintf(text1, _T("%d"), yMousePos);
-
-				myfile.open("data.csv", ios::app);
-				myfile << text;
-				myfile << ",";
-				myfile << text1;
-				myfile << ",";
-				myfile.close();
-		
-				//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
-			break;
-
-		case WT_PACKET:
 			{
-				hctx = (HCTX)lParam;
-
-				// Wintab X/Y data is in screen coordinates. These will have to
-				// be converted to client coordinates in the WM_PAINT handler.
-				if (gpWTPacket(hctx, wParam, &pkt))
-				{
-					//WacomTrace("Render point for hctx: 0x%X\n", hctx);
-					//For Debug...chap nebar nei
-
-					ptOld = ptNew;
-					prsOld = prsNew;
-
-					ptNew.x = pkt.pkX;
-					ptNew.y = pkt.pkY;
-
-					prsNew = pkt.pkNormalPressure;
-
-					_stprintf(text2, _T("%d"), prsNew);
-					myfile.open("data.csv", ios::app);
-					myfile << text2;
-					myfile << ",\n";
-					myfile.close();
-
-					if (ptNew.x != ptOld.x ||
-						 ptNew.y != ptOld.y ||
-						 prsNew != prsOld) 
-					{
-						InvalidateRect(hWnd, NULL, FALSE);
-					}
-				}
-				else
-				{
-					WacomTrace("Oops - got pinged by an unknown context: 0x%X", hctx);
-				}
+				WacomTrace("Oops - couldn't find context: 0x%X\n", hctx);
 			}
-			break;
-
-      case WT_INFOCHANGE:
-         {
-            int nAttachedDevices = 0;
-            gpWTInfoA(WTI_INTERFACE, IFC_NDEVICES, &nAttachedDevices);
-
-            WacomTrace("WT_INFOCHANGE detected; number of connected tablets is now: %i\n", nAttachedDevices);
-
-				if (nAttachedDevices != gnAttachedDevices )
-				{
-					// kill all current tablet contexts
-					CloseTabletContexts();
-
-					// Add some delay to give driver a chance to catch up in configuring
-					// to the current attached tablets.  
-					// 1 second seems to work - your mileage may vary...
-					::Sleep(1000);
-
-					// re-enumerate attached tablets
-					OpenTabletContexts(hWnd);
-				}
-
-				if ( gnAttachedDevices == 0 )
-				{
-					ShowError("No tablets found.");
-					SendMessage(hWnd, WM_DESTROY, 0, 0L);
-				}
-         }
-         break;
-
-		case WT_PROXIMITY:
-			{
-				hctx = (HCTX)wParam;
-
-				bool entering = (HIWORD(lParam) != 0);
-
-				if ( entering )
-				{
-					if ( gContextMap.count(hctx) > 0 )
-					{
-						TabletInfo info = gContextMap[hctx];
-
-						std::stringstream szTitle;	szTitle.flush();
-						szTitle << gpszProgramName << "; #tablet(s) attached: " << gnAttachedDevices << "; drawing on: " << info.name;
-						WacomTrace("Tablet name: %s\n", szTitle.str().c_str());
-						SetWindowText(hWnd, szTitle.str().c_str());
-					}
-					else
-					{
-						WacomTrace("Oops - couldn't find context: 0x%X\n", hctx);
-					}
-				}
-			}
-			break;
+		}
+	}
+	break;
 
 
 	//case WM_ACTIVATE:
@@ -530,44 +543,44 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message ,WPARAM wParam, LPARA
 		//	}
 		//	break;
 
-		case WM_DESTROY:
-			CloseTabletContexts();
+	case WM_DESTROY:
+		CloseTabletContexts();
 
-			PostQuitMessage(0);
-			break;
+		PostQuitMessage(0);
+		break;
 
-		case WM_PAINT:
-			if (hDC = BeginPaint(hWnd, &psPaint)) 
+	case WM_PAINT:
+		if (hDC = BeginPaint(hWnd, &psPaint))
+		{
+			if (prsNew > 0)
 			{
-				if ( prsNew > 0 )
-				{
-					HGDIOBJ original = SelectObject(hDC,GetStockObject(DC_PEN));
-					int penWidth = (int)(1 + std::floor(10 * (double)prsNew / (double)gContextMap[hctx].maxPressure));
+				HGDIOBJ original = SelectObject(hDC, GetStockObject(DC_PEN));
+				int penWidth = (int)(1 + std::floor(10 * (double)prsNew / (double)gContextMap[hctx].maxPressure));
 
-					COLORREF penColor = gContextMap[hctx].penColor;
+				COLORREF penColor = gContextMap[hctx].penColor;
 
-					HPEN hPen = CreatePen(PS_SOLID,penWidth,penColor);
-					SelectObject(hDC, hPen);
+				HPEN hPen = CreatePen(PS_SOLID, penWidth, penColor);
+				SelectObject(hDC, hPen);
 
-					POINT oldPoint = {ptOld.x, ptOld.y};
-					POINT newPoint = {ptNew.x, ptNew.y};
+				POINT oldPoint = { ptOld.x, ptOld.y };
+				POINT newPoint = { ptNew.x, ptNew.y };
 
-					ScreenToClient(hWnd, &oldPoint);
-					ScreenToClient(hWnd, &newPoint);
+				ScreenToClient(hWnd, &oldPoint);
+				ScreenToClient(hWnd, &newPoint);
 
-					MoveToEx(hDC, oldPoint.x, oldPoint.y, NULL);
-					LineTo(hDC, newPoint.x, newPoint.y);
+				MoveToEx(hDC, oldPoint.x, oldPoint.y, NULL);
+				LineTo(hDC, newPoint.x, newPoint.y);
 
-					DeleteObject(hPen);
-					SelectObject(hDC,original);
-					EndPaint(hWnd, &psPaint);
-				}
+				DeleteObject(hPen);
+				SelectObject(hDC, original);
+				EndPaint(hWnd, &psPaint);
 			}
-			break;
+		}
+		break;
 
-		default:
-			fHandled = FALSE;
-			break;
+	default:
+		fHandled = FALSE;
+		break;
 	}
 	if (fHandled)
 		return (lResult);
@@ -586,9 +599,9 @@ BOOL FAR PASCAL About(HWND hDlg, unsigned message, WPARAM wParam, LPARAM lParam)
 
 	case WM_COMMAND:
 		if (GET_WM_COMMAND_ID(wParam, lParam) == IDOK
-				|| GET_WM_COMMAND_ID(wParam, lParam) == IDCANCEL) {
-		EndDialog(hDlg, TRUE);
-		return (TRUE);
+			|| GET_WM_COMMAND_ID(wParam, lParam) == IDCANCEL) {
+			EndDialog(hDlg, TRUE);
+			return (TRUE);
 		}
 		break;
 	}
@@ -597,11 +610,9 @@ BOOL FAR PASCAL About(HWND hDlg, unsigned message, WPARAM wParam, LPARAM lParam)
 
 
 
-void Cleanup( void )
+void Cleanup(void)
 {
-	WACOM_TRACE( "Cleanup()\n" );
+	WACOM_TRACE("Cleanup()\n");
 
-	UnloadWintab( );
+	UnloadWintab();
 }
-
-
