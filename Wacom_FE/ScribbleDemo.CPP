@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------s
 	NAME
 		ScribbleDemo.cpp
-		Modified to work for Wacom Featture Extractor App
+		Modified to work for Wacom Feature Extractor App
 		By Souvik Chakraborty,2019
 		Please do not remove auto-generated/informative comments
 ---------------------------------------------------------------------------- */
@@ -24,8 +24,11 @@
 using namespace std;
 std::ofstream myfile;
 std::ofstream myfile1;
+std::ofstream penup;
 char myfilename[1000] = { '\0' };
 char myfile1name[1000] = { '\0' };
+int temp = 255;
+int cpenup = 0;
 
 HINSTANCE hInst = NULL;
 
@@ -140,7 +143,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	/* Save the instance handle in static variable, which will be used in  */
 	/* many subsequence calls from this application to Windows.            */
-
+	cpenup = 0;
 	hInst = hInstance;
 	ShowError("WACOM FEATURE EXTRACTOR UNDER DEVELOPMENT. PLEASE USE WITH DISCRETION");
 
@@ -372,6 +375,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text[5] = { '\0' };
 	TCHAR text1[5] = { '\0' };
 	TCHAR text2[10] = { '\0' };
+	TCHAR text3[100] = { '\0' };
 
 
 	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
@@ -449,9 +453,16 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 			ptNew.x = pkt.pkX;
 			ptNew.y = pkt.pkY;
-
 			prsNew = pkt.pkNormalPressure;
-
+			if ((prsNew != 0) && (temp == 0))
+			{
+				cpenup++;
+			}
+			temp = prsNew;
+			penup.open("penup.txt");
+			_stprintf(text3, _T("%d"), cpenup);
+			penup << text3;
+			penup.close();
 			_stprintf(text2, _T("%d"), prsNew);
 			//if (ptmp != prsNew)
 			//{
