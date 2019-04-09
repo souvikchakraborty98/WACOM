@@ -21,14 +21,25 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <time.h>
 using namespace std;
 std::ofstream myfile;
 std::ofstream myfile1;
 std::ofstream penup;
 char myfilename[1000] = { '\0' };
 char myfile1name[1000] = { '\0' };
+char myfile2name[1000] = { '\0' };
 int temp = 255;
 int cpenup = 0;
+long noofcordin = 0;
+long noofpressurepoints = 0;
+double avgpressure = 0.0;
+double speed = 0.0;
+double timeelap=0.0 ;
+long pressureSum;
+SYSTEMTIME lt;
+clock_t start, finish;
+int c = 0;
 
 HINSTANCE hInst = NULL;
 
@@ -185,7 +196,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		ShowError("Could not create window!");
 		return (FALSE);
 	}
-	SYSTEMTIME lt;
+	
 
 	GetLocalTime(&lt);
 	sprintf(myfilename, "Coordinate Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute,lt.wSecond,lt.wDay,lt.wMonth,lt.wYear);
@@ -196,6 +207,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	myfile1.open(myfile1name);
 	myfile1 << "Pressure Data\n";
 	myfile1.close();
+	sprintf(myfile2name, "Report Generated Time_%hu_%hu_%hu Date_%hu_%hu_%hu.txt", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
 	//myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
 	//myfile1 << "Coordinate Data\n";
 	//myfile1.close();
@@ -258,7 +270,7 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 			if (wWTInfoRetVal != sizeof(AXIS))
 			{
 				WacomTrace("This context should not be opened.\n");
-				continue;
+	     		continue;
 			}
 
 			wWTInfoRetVal = gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_Y, &TabletY);
@@ -376,6 +388,11 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text1[5] = { '\0' };
 	TCHAR text2[10] = { '\0' };
 	TCHAR text3[100] = { '\0' };
+	TCHAR text4[100] = { '\0' };
+	TCHAR text5[100] = { '\0' };
+	TCHAR text6[100] = { '\0' };
+	TCHAR text7[100] = { '\0' };
+	TCHAR text8[100] = { '\0' };
 
 
 	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
@@ -384,7 +401,6 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
 	myfile1 << "Coordinate Data\n";
 	myfile1.close();*/
-
 	switch (message)
 	{
 	case WM_CREATE:
@@ -392,9 +408,9 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		if (!OpenTabletContexts(hWnd))
 		{
 			ShowError("Oops! No tablets attached. Please plug in device!");
-			SendMessage(hWnd, WM_DESTROY, 0, 0L);
+			//SendMessage(hWnd, WM_DESTROY, 0, 0L);
 		}
-
+		
 		break;
 
 	case WM_MOVE:
@@ -421,6 +437,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		
 		_stprintf(text, _T("%d"), xMousePos);
 		_stprintf(text1, _T("%d"), yMousePos);
+		noofcordin++;
 		//if (xMousePos != tmp1 && yMousePos != tmp2)
 		//{
 			myfile.open(myfilename, ios::app);
@@ -454,24 +471,35 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			ptNew.x = pkt.pkX;
 			ptNew.y = pkt.pkY;
 			prsNew = pkt.pkNormalPressure;
+
+			if (prsNew != 0)
+			{
+				noofpressurepoints++;
+				if (c < 1)
+				{
+					start = clock();
+					c++;
+				}
+				finish = clock();
+			}
 			if ((prsNew != 0) && (temp == 0))
 			{
 				cpenup++;
 			}
 			temp = prsNew;
-			penup.open("penup.txt");
-			_stprintf(text3, _T("%d"), cpenup);
-			penup << text3;
-			penup.close();
+			pressureSum =pressureSum + prsNew;
+			//penup.open("penup.txt");
+			//_stprintf(text3, _T("Pen UP-Down Count=%d"), cpenup);
+			//penup << text3;
+			//penup.close();
 			_stprintf(text2, _T("%d"), prsNew);
-			//if (ptmp != prsNew)
-			//{
+			
 				myfile1.open(myfile1name, ios::app);
 				myfile1 << text2;
 				myfile1 << ",";
 				myfile1 << "\n";
 				myfile1.close();
-			//}
+			
 			
 			if (ptNew.x != ptOld.x ||
 				ptNew.y != ptOld.y ||
@@ -555,9 +583,34 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		//	break;
 
 	case WM_DESTROY:
+		timeelap = (double)(finish - start) / CLOCKS_PER_SEC;
+		speed = noofcordin / timeelap;
 		CloseTabletContexts();
 
 		PostQuitMessage(0);
+		
+		
+		avgpressure = pressureSum / noofpressurepoints;
+		_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
+		_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
+		_stprintf(text7, _T("Elapsed Time(for drawing)=%lf seconds\n"), timeelap);
+		_stprintf(text5, _T("Average Speed=%lf pixels/sec\n"), speed);
+		_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
+		
+		penup.open(myfile2name, ios::app);
+		penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name<< "\n";
+		penup << "=======================================================================================================\n\n";
+		penup << text3;
+		penup << text4;
+		penup << text7;
+		penup << text5;
+		penup << text6;
+		penup << "\n";
+		penup << "----------------";
+		penup << "End Of File";
+		penup << "----------------";
+		penup.close();
+		
 		break;
 
 	case WM_PAINT:
@@ -593,6 +646,11 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		fHandled = FALSE;
 		break;
 	}
+	
+
+	penup.close();
+	
+
 	if (fHandled)
 		return (lResult);
 	else
