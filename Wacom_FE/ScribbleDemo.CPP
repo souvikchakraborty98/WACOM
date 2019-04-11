@@ -29,6 +29,7 @@ std::ofstream penup;
 char myfilename[1000] = { '\0' };
 char myfile1name[1000] = { '\0' };
 char myfile2name[1000] = { '\0' };
+char mydirec[1000] = { '\0' };
 int temp = 255;
 int cpenup = 0;
 long noofcordin = 0;
@@ -40,6 +41,8 @@ long pressureSum;
 SYSTEMTIME lt;
 clock_t start, finish;
 int c = 0;
+
+
 
 HINSTANCE hInst = NULL;
 
@@ -394,6 +397,10 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text7[100] = { '\0' };
 	TCHAR text8[100] = { '\0' };
 
+	DWORD nBufferLength = MAX_PATH;
+	char szCurrentDirectory[MAX_PATH + 1] = { '\0' };
+	GetCurrentDirectory(nBufferLength, szCurrentDirectory);
+
 
 	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
 	myfile << "Pressure Data\n";
@@ -452,6 +459,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		//tmp2 = yMousePos;
 
 		//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
+			//whoever tries to copy this code uski maa ki....
 		break;
 
 	case WT_PACKET:
@@ -588,8 +596,17 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		CloseTabletContexts();
 
 		PostQuitMessage(0);
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+		si.wShowWindow = SW_MAXIMIZE;
+		si.dwFlags |= STARTF_USESHOWWINDOW;
+		sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);
+
 		
-		
+		penup.open(myfile2name, ios::app);
 		avgpressure = pressureSum / noofpressurepoints;
 		_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
 		_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
@@ -597,7 +614,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		_stprintf(text5, _T("Average Speed=%lf pixels/sec\n"), speed);
 		_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
 		
-		penup.open(myfile2name, ios::app);
+		
 		penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name<< "\n";
 		penup << "=======================================================================================================\n\n";
 		penup << text3;
@@ -610,6 +627,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		penup << "End Of File";
 		penup << "----------------";
 		penup.close();
+		CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		
 		break;
 

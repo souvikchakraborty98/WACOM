@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wacom Feature Extractor", "ScribbleDemo.vcxproj", "{E28505A9-34F8-41F3-BF9B-3C3D66E4F8AE}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "..\Setup\Setup.vdproj", "{C55E8B3B-C126-4E69-B052-42ABF5559521}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,8 @@ Global
 		{E28505A9-34F8-41F3-BF9B-3C3D66E4F8AE}.Debug|Win32.Build.0 = Release|Win32
 		{E28505A9-34F8-41F3-BF9B-3C3D66E4F8AE}.Release|Win32.ActiveCfg = Release|Win32
 		{E28505A9-34F8-41F3-BF9B-3C3D66E4F8AE}.Release|Win32.Build.0 = Release|Win32
+		{C55E8B3B-C126-4E69-B052-42ABF5559521}.Debug|Win32.ActiveCfg = Debug
+		{C55E8B3B-C126-4E69-B052-42ABF5559521}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
