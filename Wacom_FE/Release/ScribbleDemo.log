@@ -1,4 +1,6 @@
-﻿  ScribbleDemo.CPP
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\release\wacom feature extractor.exe' because it is being used by another process.
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\release\wacom feature extractor.exe' because it is being used by another process.
+  ScribbleDemo.CPP
   Utils.cpp
   Generating Code...
   ScribbleDemo.vcxproj -> C:\Users\Souvik\Documents\classes\PROJECT\Wacom\WACOM\Wacom_FE\.\Release\Wacom Feature Extractor.exe
