@@ -4,6 +4,7 @@
 //
 #define SW_HIDE                         0
 #define HIDE_WINDOW                     0
+#define IDI_MYICON						201
 #define WM_NULL                         0x0000
 #define WA_INACTIVE                     0
 #define HTNOWHERE                       0
@@ -1506,7 +1507,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        101
+#define _APS_NEXT_RESOURCE_VALUE        102
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101

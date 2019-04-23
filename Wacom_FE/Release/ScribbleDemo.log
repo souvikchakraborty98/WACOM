@@ -1,6 +1,46 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\release\wacom feature extractor.exe' because it is being used by another process.
-C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\release\wacom feature extractor.exe' because it is being used by another process.
-  ScribbleDemo.CPP
+﻿  ScribbleDemo.CPP
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(41): warning C4005: 'CREATEPROCESS_MANIFEST_RESOURCE_ID': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(262): note: see previous definition of 'CREATEPROCESS_MANIFEST_RESOURCE_ID'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(42): warning C4005: 'MINIMUM_RESERVED_MANIFEST_RESOURCE_ID': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(266): note: see previous definition of 'MINIMUM_RESERVED_MANIFEST_RESOURCE_ID'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(215): warning C4005: 'ISOLATIONAWARE_MANIFEST_RESOURCE_ID': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(263): note: see previous definition of 'ISOLATIONAWARE_MANIFEST_RESOURCE_ID'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(294): warning C4005: 'ISOLATIONAWARE_NOSTATICIMPORT_MANIFEST_RESOURCE_ID': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(264): note: see previous definition of 'ISOLATIONAWARE_NOSTATICIMPORT_MANIFEST_RESOURCE_ID'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(518): warning C4005: 'MAXIMUM_RESERVED_MANIFEST_RESOURCE_ID': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(267): note: see previous definition of 'MAXIMUM_RESERVED_MANIFEST_RESOURCE_ID'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(580): warning C4005: 'RT_MANIFEST': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(261): note: see previous definition of 'RT_MANIFEST'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1343): warning C4005: '_WIN32_WINNT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\shared\sdkddkver.h(216): note: see previous definition of '_WIN32_WINNT'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1366): warning C4005: '_WIN32_IE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\shared\sdkddkver.h(261): note: see previous definition of '_WIN32_IE'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1410): warning C4005: 'IDI_APPLICATION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10794): note: see previous definition of 'IDI_APPLICATION'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1413): warning C4005: 'IDI_HAND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10795): note: see previous definition of 'IDI_HAND'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1416): warning C4005: 'IDI_QUESTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10796): note: see previous definition of 'IDI_QUESTION'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1419): warning C4005: 'IDI_EXCLAMATION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10797): note: see previous definition of 'IDI_EXCLAMATION'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1422): warning C4005: 'IDI_ASTERISK': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10798): note: see previous definition of 'IDI_ASTERISK'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1424): warning C4005: 'IDI_WINLOGO': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10800): note: see previous definition of 'IDI_WINLOGO'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1426): warning C4005: 'IDI_SHIELD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(10803): note: see previous definition of 'IDI_SHIELD'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1501): warning C4005: 'HTERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(2541): note: see previous definition of 'HTERROR'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1502): warning C4005: 'PWR_FAIL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(2050): note: see previous definition of 'PWR_FAIL'
+c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1504): warning C4005: 'HTTRANSPARENT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(2542): note: see previous definition of 'HTTRANSPARENT'
   Utils.cpp
   Generating Code...
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\winuser.rh(472): warning RC4005: 'PWR_FAIL' : redefinition
+  
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\winuser.rh(886): warning RC4005: 'HTERROR' : redefinition
+  
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\winuser.rh(887): warning RC4005: 'HTTRANSPARENT' : redefinition
+  
   ScribbleDemo.vcxproj -> C:\Users\Souvik\Documents\classes\PROJECT\Wacom\WACOM\Wacom_FE\.\Release\Wacom Feature Extractor.exe

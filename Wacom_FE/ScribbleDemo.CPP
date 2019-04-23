@@ -7,6 +7,7 @@
 ---------------------------------------------------------------------------- */
 
 #include <windows.h>
+#include "resource.h"
 #include <windowsx.h>
 #include "msgpack.h"
 #include "wintab.h"
@@ -136,7 +137,7 @@ BOOL InitApplication(HINSTANCE hInstance)
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MYICON));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_APPWORKSPACE + 1);
 	wc.lpszMenuName = "ScribbleDemoMenu";
@@ -398,7 +399,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text7[100] = { '\0' };
 	TCHAR text8[100] = { '\0' };
 	
-
+	//getting working directory for data storage
 	DWORD nBufferLength = MAX_PATH;
 	char szCurrentDirectory[MAX_PATH + 1] = { '\0' };
 	GetCurrentDirectory(nBufferLength, szCurrentDirectory);
@@ -429,7 +430,12 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			myfile1 << "Pressure Data\n";
 			myfile1.close();
 		}
+		else
+		{
+			ShowError("No Data files were created");
+		}
 		
+
 		break;
 
 	case WM_MOVE:
@@ -511,12 +517,14 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			//penup << text3;
 			//penup.close();
 			_stprintf(text2, _T("%d"), prsNew);
-			
+			if (flag == 1)
+			{
 				myfile1.open(myfile1name, ios::app);
 				myfile1 << text2;
 				myfile1 << ",";
 				myfile1 << "\n";
 				myfile1.close();
+			}
 			
 			
 			if (ptNew.x != ptOld.x ||
@@ -637,6 +645,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		penup << "End Of File";
 		penup << "----------------";
 		penup.close();
+		//opening containing folder
 		CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		
 		break;

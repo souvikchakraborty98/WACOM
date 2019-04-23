@@ -1,6 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include <windows.h>
+
+IDI_MYICON ICON "C:/Users/Souvik/Documents/classes/PROJECT/Wacom/WACOM/Wacom_FE/Pen.ico"
 /////////////////////////////////////////////////////////////////////////////
 // English (India) resources
 
