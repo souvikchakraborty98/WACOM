@@ -132,6 +132,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -152,6 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ScribbleDemo.RC" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Pen.ico" />
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
