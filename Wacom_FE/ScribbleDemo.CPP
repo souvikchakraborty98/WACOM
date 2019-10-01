@@ -7,6 +7,7 @@
 ---------------------------------------------------------------------------- */
 
 #include <windows.h>
+#include "resource.h"
 #include <windowsx.h>
 #include "msgpack.h"
 #include "wintab.h"
@@ -22,6 +23,7 @@
 #include <iostream>
 #include <fstream>
 #include <time.h>
+#include <excpt.h>
 using namespace std;
 std::ofstream myfile;
 std::ofstream myfile1;
@@ -29,17 +31,20 @@ std::ofstream penup;
 char myfilename[1000] = { '\0' };
 char myfile1name[1000] = { '\0' };
 char myfile2name[1000] = { '\0' };
+char mydirec[1000] = { '\0' };
 int temp = 255;
 int cpenup = 0;
 long noofcordin = 0;
 long noofpressurepoints = 0;
 double avgpressure = 0.0;
 double speed = 0.0;
-double timeelap=0.0 ;
+double timeelap = 0.0;
 long pressureSum;
 SYSTEMTIME lt;
 clock_t start, finish;
 int c = 0;
+int flag = 1;
+
 
 HINSTANCE hInst = NULL;
 
@@ -132,7 +137,7 @@ BOOL InitApplication(HINSTANCE hInstance)
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MYICON));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_APPWORKSPACE + 1);
 	wc.lpszMenuName = "ScribbleDemoMenu";
@@ -196,18 +201,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		ShowError("Could not create window!");
 		return (FALSE);
 	}
-	
+
 
 	GetLocalTime(&lt);
-	sprintf(myfilename, "Coordinate Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute,lt.wSecond,lt.wDay,lt.wMonth,lt.wYear);
+	sprintf(myfilename, "Coordinate Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
 	sprintf(myfile1name, "Pressure Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
-	myfile.open(myfilename);
+	sprintf(myfile2name, "Report Generated Time_%hu_%hu_%hu Date_%hu_%hu_%hu.txt", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
+	/*myfile.open(myfilename);
 	myfile << "Coordinate Data\n";
 	myfile.close();
 	myfile1.open(myfile1name);
 	myfile1 << "Pressure Data\n";
-	myfile1.close();
-	sprintf(myfile2name, "Report Generated Time_%hu_%hu_%hu Date_%hu_%hu_%hu.txt", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
+	myfile1.close();*/
 	//myfile1.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/coordinatedata.csv", ios::app);
 	//myfile1 << "Coordinate Data\n";
 	//myfile1.close();
@@ -270,7 +275,7 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 			if (wWTInfoRetVal != sizeof(AXIS))
 			{
 				WacomTrace("This context should not be opened.\n");
-	     		continue;
+				continue;
 			}
 
 			wWTInfoRetVal = gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_Y, &TabletY);
@@ -394,6 +399,11 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text7[100] = { '\0' };
 	TCHAR text8[100] = { '\0' };
 
+	//getting working directory for data storage
+	DWORD nBufferLength = MAX_PATH;
+	char szCurrentDirectory[MAX_PATH + 1] = { '\0' };
+	GetCurrentDirectory(nBufferLength, szCurrentDirectory);
+
 
 	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
 	myfile << "Pressure Data\n";
@@ -407,10 +417,25 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		// Initialize a Wintab context for each connected tablet.
 		if (!OpenTabletContexts(hWnd))
 		{
-			ShowError("Oops! No tablets attached. Please plug in device!");
+			ShowError("Oops! No tablets attached. Please plug in device and restart application!");
 			//SendMessage(hWnd, WM_DESTROY, 0, 0L);
+			flag = 0;
 		}
-		
+		if (flag == 1)
+		{
+			myfile.open(myfilename);
+			myfile << "Coordinate Data\n";
+			myfile.close();
+			myfile1.open(myfile1name);
+			myfile1 << "Pressure Data\n";
+			myfile1.close();
+		}
+		else
+		{
+			ShowError("No Data files were created");
+		}
+
+
 		break;
 
 	case WM_MOVE:
@@ -434,12 +459,12 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	case WM_MOUSEMOVE:
 		xMousePos = GET_X_LPARAM(lParam);
 		yMousePos = GET_Y_LPARAM(lParam);
-		
-		_stprintf(text, _T("%d"), xMousePos);
-		_stprintf(text1, _T("%d"), yMousePos);
-		noofcordin++;
-		//if (xMousePos != tmp1 && yMousePos != tmp2)
-		//{
+		if (flag == 1)
+		{
+			_stprintf(text, _T("%d"), xMousePos);
+			_stprintf(text1, _T("%d"), yMousePos);
+			noofcordin++;
+
 			myfile.open(myfilename, ios::app);
 			myfile << text;
 			myfile << ",";
@@ -447,11 +472,10 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			myfile << ",";
 			myfile << "\n";
 			myfile.close();
-		//}
-		//tmp1 = xMousePos;
-		//tmp2 = yMousePos;
+		}
 
 		//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
+			//whoever tries to copy this code uski maa ki....
 		break;
 
 	case WT_PACKET:
@@ -487,20 +511,22 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 				cpenup++;
 			}
 			temp = prsNew;
-			pressureSum =pressureSum + prsNew;
+			pressureSum = pressureSum + prsNew;
 			//penup.open("penup.txt");
 			//_stprintf(text3, _T("Pen UP-Down Count=%d"), cpenup);
 			//penup << text3;
 			//penup.close();
 			_stprintf(text2, _T("%d"), prsNew);
-			
+			if (flag == 1)
+			{
 				myfile1.open(myfile1name, ios::app);
 				myfile1 << text2;
 				myfile1 << ",";
 				myfile1 << "\n";
 				myfile1.close();
-			
-			
+			}
+
+
 			if (ptNew.x != ptOld.x ||
 				ptNew.y != ptOld.y ||
 				prsNew != prsOld)
@@ -583,22 +609,31 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		//	break;
 
 	case WM_DESTROY:
+	    avgpressure = pressureSum / noofpressurepoints;
 		timeelap = (double)(finish - start) / CLOCKS_PER_SEC;
 		speed = noofcordin / timeelap;
 		CloseTabletContexts();
 
 		PostQuitMessage(0);
-		
-		
-		avgpressure = pressureSum / noofpressurepoints;
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+		si.wShowWindow = SW_MAXIMIZE;
+		si.dwFlags |= STARTF_USESHOWWINDOW;
+		sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);
+
+
+		penup.open(myfile2name, ios::app);
 		_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
 		_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
 		_stprintf(text7, _T("Elapsed Time(for drawing)=%lf seconds\n"), timeelap);
 		_stprintf(text5, _T("Average Speed=%lf pixels/sec\n"), speed);
 		_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
-		
-		penup.open(myfile2name, ios::app);
-		penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name<< "\n";
+
+
+		penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name << "\n";
 		penup << "=======================================================================================================\n\n";
 		penup << text3;
 		penup << text4;
@@ -610,7 +645,9 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		penup << "End Of File";
 		penup << "----------------";
 		penup.close();
-		
+		//opening containing folder
+		CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+
 		break;
 
 	case WM_PAINT:
@@ -646,10 +683,10 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		fHandled = FALSE;
 		break;
 	}
-	
+
 
 	penup.close();
-	
+
 
 	if (fHandled)
 		return (lResult);

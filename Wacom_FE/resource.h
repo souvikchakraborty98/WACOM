@@ -4,6 +4,7 @@
 //
 #define SW_HIDE                         0
 #define HIDE_WINDOW                     0
+#define IDI_MYICON						201
 #define WM_NULL                         0x0000
 #define WA_INACTIVE                     0
 #define HTNOWHERE                       0

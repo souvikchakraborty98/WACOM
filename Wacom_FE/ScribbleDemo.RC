@@ -1,6 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include <windows.h>
+
+IDI_MYICON ICON "C:/Users/Souvik/Documents/classes/PROJECT/Wacom/WACOM/Wacom_FE/Pen.ico"
 /////////////////////////////////////////////////////////////////////////////
 // English (India) resources
 
@@ -15,10 +18,10 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_INDIA
 
 SCRIBBLEDEMOMENU MENU
 BEGIN
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&About Wacom Feature Extractor...", IDM_ABOUT
-    END
+POPUP "&Help"
+BEGIN
+MENUITEM "&About Wacom Feature Extractor...", IDM_ABOUT
+END
 END
 
 
@@ -31,11 +34,11 @@ ABOUTBOX DIALOGEX 22, 17, 161, 75
 CAPTION "About Wacom Feature Extractor"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CTEXT           "LCS/Telegraphics",-1,0,3,161,8
-    CTEXT           "Modified By Souvik Chakraborty",-1,0,12,161,8
-    CTEXT           "Wacom Feature Extractor",-1,0,28,161,8
-    CTEXT           "Version 2.0",-1,0,41,161,8
-    DEFPUSHBUTTON   "OK",IDOK,65,57,32,14
+CTEXT           "LCS/Telegraphics", -1, 0, 3, 161, 8
+CTEXT           "Modified By Souvik Chakraborty", -1, 0, 12, 161, 8
+CTEXT           "Wacom Feature Extractor", -1, 0, 28, 161, 8
+CTEXT           "Version 2.0", -1, 0, 41, 161, 8
+DEFPUSHBUTTON   "OK", IDOK, 65, 57, 32, 14
 END
 
 
@@ -45,20 +48,20 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
-    "resource.h\0"
+"resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
-    "\0"
+"\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
-    "\r\n"
-    "\0"
+"\r\n"
+"\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -72,10 +75,10 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    "ABOUTBOX", DIALOG
-    BEGIN
-        TOPMARGIN, 3
-    END
+"ABOUTBOX", DIALOG
+BEGIN
+TOPMARGIN, 3
+END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -87,7 +90,7 @@ END
 
 ABOUTBOX AFX_DIALOG_LAYOUT
 BEGIN
-    0
+0
 END
 
 #endif    // English (India) resources
@@ -104,4 +107,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
