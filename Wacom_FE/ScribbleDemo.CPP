@@ -24,6 +24,8 @@
 #include <fstream>
 #include <time.h>
 #include <excpt.h>
+#include <python.h>
+
 using namespace std;
 std::ofstream myfile;
 std::ofstream myfile1;
@@ -44,6 +46,8 @@ SYSTEMTIME lt;
 clock_t start, finish;
 int c = 0;
 int flag = 1;
+FILE* ops;
+PyObject* obj;
 
 
 HINSTANCE hInst = NULL;
@@ -609,45 +613,61 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		//	break;
 
 	case WM_DESTROY:
-	    avgpressure = pressureSum / noofpressurepoints;
-		timeelap = (double)(finish - start) / CLOCKS_PER_SEC;
-		speed = noofcordin / timeelap;
+		if (flag != 0)
+		{
+			avgpressure = pressureSum / noofpressurepoints;
+			timeelap = (double)(finish - start) / CLOCKS_PER_SEC;
+			speed = noofcordin / timeelap;
+		}
+		
+		if (flag != 0)
+		{
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+			ZeroMemory(&si, sizeof(si));
+			si.cb = sizeof(si);
+			ZeroMemory(&pi, sizeof(pi));
+			si.wShowWindow = SW_MAXIMIZE;
+			si.dwFlags |= STARTF_USESHOWWINDOW;
+			sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);
+
+
+			penup.open(myfile2name, ios::app);
+			_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
+			_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
+			_stprintf(text7, _T("Elapsed Time(for drawing)=%lf seconds\n"), timeelap);
+			_stprintf(text5, _T("Average Speed=%lf pixels/sec\n"), speed);
+			_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
+
+
+			penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name << "\n";
+			penup << "=======================================================================================================\n\n";
+			penup << text3;
+			penup << text4;
+			penup << text7;
+			penup << text5;
+			penup << text6;
+			penup << "\n";
+			penup << "----------------";
+			penup << "End Of File";
+			penup << "----------------";
+			penup.close();
+			//opening containing folder
+			CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+		}
+		Py_Initialize();
+		/*ops = fopen("op.py", "r");
+		PyRun_SimpleFile(ops, "op.py");*/
+		obj = Py_BuildValue("s", "dva.py");
+		ops = _Py_fopen_obj(obj, "r+");
+		if (ops != NULL) {
+			PyRun_SimpleFile(ops, "dva.py");
+		}
+		Py_Finalize();
+
 		CloseTabletContexts();
-
 		PostQuitMessage(0);
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-		si.wShowWindow = SW_MAXIMIZE;
-		si.dwFlags |= STARTF_USESHOWWINDOW;
-		sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);
-
-
-		penup.open(myfile2name, ios::app);
-		_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
-		_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
-		_stprintf(text7, _T("Elapsed Time(for drawing)=%lf seconds\n"), timeelap);
-		_stprintf(text5, _T("Average Speed=%lf pixels/sec\n"), speed);
-		_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
-
-
-		penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name << "\n";
-		penup << "=======================================================================================================\n\n";
-		penup << text3;
-		penup << text4;
-		penup << text7;
-		penup << text5;
-		penup << text6;
-		penup << "\n";
-		penup << "----------------";
-		penup << "End Of File";
-		penup << "----------------";
-		penup.close();
-		//opening containing folder
-		CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
-
+	
 		break;
 
 	case WM_PAINT:

@@ -35,12 +35,4 @@ c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1502):
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(2050): note: see previous definition of 'PWR_FAIL'
 c:\users\souvik\documents\classes\project\wacom\wacom\wacom_fe\resource.h(1504): warning C4005: 'HTTRANSPARENT': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\winuser.h(2542): note: see previous definition of 'HTTRANSPARENT'
-  Utils.cpp
-  Generating Code...
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\winuser.rh(472): warning RC4005: 'PWR_FAIL' : redefinition
-  
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\winuser.rh(886): warning RC4005: 'HTERROR' : redefinition
-  
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\winuser.rh(887): warning RC4005: 'HTTRANSPARENT' : redefinition
-  
   ScribbleDemo.vcxproj -> C:\Users\Souvik\Documents\classes\PROJECT\Wacom\WACOM\Wacom_FE\.\Release\Wacom Feature Extractor.exe
