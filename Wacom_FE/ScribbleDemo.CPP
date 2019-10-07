@@ -25,6 +25,9 @@
 #include <time.h>
 #include <excpt.h>
 #include <python.h>
+#include <process.h>
+#include <Tlhelp32.h>
+#include <winbase.h>
 
 using namespace std;
 std::ofstream myfile;
@@ -96,6 +99,30 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
 BOOL InitApplication(HINSTANCE hInstance);
 
 ///////////////////////////////////////////////////////////////////////////////
+
+//void killprocessbyname(const char *filename)
+//{
+//	handle hsnapshot = createtoolhelp32snapshot(th32cs_snapall, null);
+//	processentry32 pentry;
+//	pentry.dwsize = sizeof(pentry);
+//	bool hres = process32first(hsnapshot, &pentry);
+//	while (hres)
+//	{
+//		if (strcmp(pentry.szexefile, filename) == 0)
+//		{
+//			handle hprocess = openprocess(process_terminate, 0,
+//				(dword)pentry.th32processid);
+//			if (hprocess != null)
+//			{
+//				terminateprocess(hprocess, 9);
+//				closehandle(hprocess);
+//			}
+//		}
+//		hres = process32next(hsnapshot, &pentry);
+//	}
+//	closehandle(hsnapshot);
+//}
+
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	MSG msg;
@@ -662,12 +689,14 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		ops = _Py_fopen_obj(obj, "r+");
 		if (ops != NULL) {
 			PyRun_SimpleFile(ops, "dva.py");
+			/*killProcessByName("Wacom Feature Extractor.exe");*/
 		}
-		Py_Finalize();
-
 		CloseTabletContexts();
 		PostQuitMessage(0);
-	
+		Py_Finalize();
+
+		
+
 		break;
 
 	case WM_PAINT:
