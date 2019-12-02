@@ -1,4 +1,3 @@
-
 # PLATFORM DEVELOPMENT TO EXTRACT  FEATURES FROM PEN TABLETS
 
 The aim is to extract data from a person's digital handwriting  from a *commercial pen tablet*. The collected data will be processed and formed into datasets for analysis via different algorithms.
@@ -28,3 +27,8 @@ For Setup download, click [here](https://github.com/souvikchakraborty98/WACOM/ra
 *This file is password protected. Please contact author.*
 
 For more Info on this project see [here.](https://github.com/souvikchakraborty98/WACOM/blob/master/PROJECT%20REPORT.pdf)
+#
+
+<img src="https://i.imgur.com/6bLS9o1.jpg" height="200" width="200" >
+
+*supported by the NewGen IEDC SRM*
