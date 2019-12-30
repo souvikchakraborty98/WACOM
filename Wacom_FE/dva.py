@@ -6,16 +6,25 @@ import mplcursors
 x = []
 y = []
 
-with open('fbs.csv','r') as csvfile:
+data="";
+f = open("filename.log", "r")
+
+for z in f:
+    data=data+z;
+
+filenamelist=data.split("+");
+filenamecoord=filenamelist[0];
+filenamepress=filenamelist[1];
+print(filenamecoord)
+print(filenamepress)
+       
+
+with open(filenamecoord,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         x.append(int(row[0]))
         y.append(int(row[1]))
 
-# fig_size = plt.rcParams["figure.figsize"]
-# fig_size[0] = 14
-# fig_size[1] = 5
-# plt.rcParams["figure.figsize"] = fig_size
 
 plt.subplot(1,2,1)
 plt.scatter(x,y,label='xy plot')
@@ -26,7 +35,7 @@ plt.legend()
 
 x = []
 
-with open('pbs.csv','r') as csvfile:
+with open(filenamepress,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         x.append(int(row[0]))
@@ -43,3 +52,4 @@ mplcursors.cursor(hover=True)
 plt.show()
 
 #subprocess.call(["Wacom Feature Extractor.exe"])
+
