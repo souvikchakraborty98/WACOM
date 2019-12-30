@@ -33,10 +33,12 @@ using namespace std;
 std::ofstream myfile;
 std::ofstream myfile1;
 std::ofstream penup;
+std::ofstream filenameDataOut;
 char myfilename[1000] = { '\0' };
 char myfile1name[1000] = { '\0' };
 char myfile2name[1000] = { '\0' };
 char mydirec[1000] = { '\0' };
+char datafile[1000] = { '\0' };
 int temp = 255;
 int cpenup = 0;
 long noofcordin = 0;
@@ -237,7 +239,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	GetLocalTime(&lt);
 	sprintf(myfilename, "Coordinate Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
 	sprintf(myfile1name, "Pressure Data Time_%hu_%hu_%hu Date_%hu_%hu_%hu.csv", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
-	sprintf(myfile2name, "Report Generated Time_%hu_%hu_%hu Date_%hu_%hu_%hu.txt", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
+	sprintf(myfile2name, "Report Generated Time_%hu_%hu_%hu Date_%hu_%hu_%hu.log", lt.wHour, lt.wMinute, lt.wSecond, lt.wDay, lt.wMonth, lt.wYear);
 	/*myfile.open(myfilename);
 	myfile << "Coordinate Data\n";
 	myfile.close();
@@ -452,7 +454,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			//SendMessage(hWnd, WM_DESTROY, 0, 0L);
 			flag = 0;
 		}
-		if (flag == 1)
+		/*if (flag == 1)
 		{
 			myfile.open(myfilename);
 			myfile << "Coordinate Data\n";
@@ -460,8 +462,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			myfile1.open(myfile1name);
 			myfile1 << "Pressure Data\n";
 			myfile1.close();
-		}
-		else
+		}*/
+		if(flag==0)
 		{
 			ShowError("No Data files were created");
 		}
@@ -658,7 +660,6 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			si.dwFlags |= STARTF_USESHOWWINDOW;
 			sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);
 
-
 			penup.open(myfile2name, ios::app);
 			_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
 			_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
@@ -667,7 +668,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
 
 
-			penup << "Automatic Report Generated for " << myfilename << " and " << myfile1name << "\n";
+			penup << "Automatic Report Generated for +" << myfilename << "+ and +" << myfile1name << "+\n";
 			penup << "=======================================================================================================\n\n";
 			penup << text3;
 			penup << text4;
@@ -682,20 +683,24 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			//opening containing folder
 			CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		}
-		Py_Initialize();
-		/*ops = fopen("op.py", "r");
-		PyRun_SimpleFile(ops, "op.py");*/
-		obj = Py_BuildValue("s", "dva.py");
-		ops = _Py_fopen_obj(obj, "r+");
-		if (ops != NULL) {
-			PyRun_SimpleFile(ops, "dva.py");
-			/*killProcessByName("Wacom Feature Extractor.exe");*/
-		}
-		CloseTabletContexts();
-		PostQuitMessage(0);
-		Py_Finalize();
 
-		
+		  
+			filenameDataOut.open("filename.log");
+			filenameDataOut << myfilename << "+" << myfile1name;
+			filenameDataOut.close();
+			Py_Initialize();
+			/*ops = fopen("op.py", "r");
+			PyRun_SimpleFile(ops, "op.py");*/
+			obj = Py_BuildValue("s", "dva.py");
+			ops = _Py_fopen_obj(obj, "r+");
+			if (ops != NULL) {
+				PyRun_SimpleFile(ops, "dva.py");
+				/*killProcessByName("Wacom Feature Extractor.exe");*/  //not working yet
+			}
+			CloseTabletContexts();
+			PostQuitMessage(0);
+			Py_Finalize();
+	
 
 		break;
 
