@@ -27,6 +27,7 @@
 #include <python.h>
 #include <process.h>
 #include <Tlhelp32.h>
+#include <chrono>
 #include <winbase.h>
 
 using namespace std;
@@ -633,7 +634,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		//	if (GET_WM_ACTIVATE_STATE(wParam, lParam))
 		//		InvalidateRect(hWnd, NULL, TRUE);
 
-		//	/* if switching in the middle, disable the region */
+		//	/* if switching in the middle, disable the region,will prob never need it */
 		//	if (hCtx) {
 		//		gpWTEnable(hCtx, GET_WM_ACTIVATE_STATE(wParam, lParam));
 		//		if (hCtx && GET_WM_ACTIVATE_STATE(wParam, lParam))
@@ -684,7 +685,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		}
 
-		  
+		_sleep(1000);
+
 			filenameDataOut.open("filename.log");
 			filenameDataOut << myfilename << "+" << myfile1name;
 			filenameDataOut.close();

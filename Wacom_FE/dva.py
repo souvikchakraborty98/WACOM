@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import csv
-import subprocess
+#import subprocess
 import mplcursors
 
 x = []
@@ -15,9 +15,6 @@ for z in f:
 filenamelist=data.split("+");
 filenamecoord=filenamelist[0];
 filenamepress=filenamelist[1];
-print(filenamecoord)
-print(filenamepress)
-       
 
 with open(filenamecoord,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
@@ -25,13 +22,15 @@ with open(filenamecoord,'r') as csvfile:
         x.append(int(row[0]))
         y.append(int(row[1]))
 
-
 plt.subplot(1,2,1)
 plt.scatter(x,y,label='xy plot')
+ax = plt.gca()
+ax.set_ylim(ax.get_ylim()[::-1])
 plt.xlabel('x pixels')
 plt.ylabel('y pixels')
 plt.title('Coordinate data Scatter plot')
 plt.legend()
+
 
 x = []
 
@@ -46,6 +45,8 @@ plt.xlabel('x pixels')
 plt.ylabel('y pixels')
 plt.title('Presssure data 2D plot')
 plt.legend()
+
+
 mng=plt.get_current_fig_manager()
 mng.window.state("zoomed")
 mplcursors.cursor(hover=True)
