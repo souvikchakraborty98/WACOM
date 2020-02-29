@@ -38,7 +38,7 @@ std::ofstream filenameDataOut;
 char myfilename[1000] = { '\0' };
 char myfile1name[1000] = { '\0' };
 char myfile2name[1000] = { '\0' };
-char mydirec[1000] = { '\0' };
+//char mydirec[1000] = { '\0' };
 char datafile[1000] = { '\0' };
 int temp = 255;
 int cpenup = 0;
@@ -88,7 +88,7 @@ typedef enum
 	MAX_PEN_COLOR
 } EPenColor;
 
-EPenColor gNextPenColor = PenColorBlue;
+EPenColor gNextPenColor = PenColorGreen;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Global variables
@@ -331,6 +331,7 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 			// so that it coincides with screen origin.
 			//Also to remember that this is not the case with MS Excel
 			// In Excel everything will be inverted
+			//That's why I flipped axes in matplotlib ;)
 			lcMine.lcOutExtY = -GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
 			// Leave the system origin and extents as received:
@@ -338,6 +339,7 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 
 			// Open the context enabled.
 			HCTX hCtx = gpWTOpenA(hWnd, &lcMine, TRUE);
+			gpWTQueueSizeSet(hCtx, 126);
 
 			if (hCtx)
 			{
@@ -432,11 +434,13 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text6[100] = { '\0' };
 	TCHAR text7[100] = { '\0' };
 	TCHAR text8[100] = { '\0' };
+	/*TCHAR text9[100] = { '\0' };
+	TCHAR text10[100] = { '\0' };*/
 
 	//getting working directory for data storage
-	DWORD nBufferLength = MAX_PATH;
+	/*DWORD nBufferLength = MAX_PATH;
 	char szCurrentDirectory[MAX_PATH + 1] = { '\0' };
-	GetCurrentDirectory(nBufferLength, szCurrentDirectory);
+	GetCurrentDirectory(nBufferLength, szCurrentDirectory);*/
 
 
 	/*myfile.open("C:/Users/Souvik/Documents/classes/PROJECT/Wacom/pressuredata.csv", ios::app);
@@ -493,7 +497,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	case WM_MOUSEMOVE:
 		xMousePos = GET_X_LPARAM(lParam);
 		yMousePos = GET_Y_LPARAM(lParam);
-		if (flag == 1)
+		
+		if ((flag == 1) && (prsNew > 0))
 		{
 			_stprintf(text, _T("%d"), xMousePos);
 			_stprintf(text1, _T("%d"), yMousePos);
@@ -530,35 +535,35 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			ptNew.y = pkt.pkY;
 			prsNew = pkt.pkNormalPressure;
 
-			if (prsNew != 0)
-			{
-				noofpressurepoints++;
-				if (c < 1)
-				{
-					start = clock();
-					c++;
-				}
-				finish = clock();
-			}
-			if ((prsNew != 0) && (temp == 0))
-			{
-				cpenup++;
-			}
-			temp = prsNew;
-			pressureSum = pressureSum + prsNew;
-			//penup.open("penup.txt");
-			//_stprintf(text3, _T("Pen UP-Down Count=%d"), cpenup);
-			//penup << text3;
-			//penup.close();
-			_stprintf(text2, _T("%d"), prsNew);
-			if (flag == 1)
-			{
-				myfile1.open(myfile1name, ios::app);
-				myfile1 << text2;
-				myfile1 << ",";
-				myfile1 << "\n";
-				myfile1.close();
-			}
+			//if (prsNew != 0)
+			//{
+			//	noofpressurepoints++;
+			//	if (c < 1)
+			//	{
+			//		start = clock();
+			//		c++;
+			//	}
+			//	finish = clock();
+			//}
+			//if ((prsNew != 0) && (temp == 0))
+			//{
+			//	cpenup++;
+			//}
+			//temp = prsNew;
+			//pressureSum = pressureSum + prsNew;
+			////penup.open("penup.txt");
+			////_stprintf(text3, _T("Pen UP-Down Count=%d"), cpenup);
+			////penup << text3;
+			////penup.close();
+			//_stprintf(text2, _T("%d"), prsNew);
+			//if (flag == 1)
+			//{
+			//	myfile1.open(myfile1name, ios::app);
+			//	myfile1 << text2;
+			//	myfile1 << ",";
+			//	myfile1 << "\n";
+			//	myfile1.close();
+			//}
 
 
 			if (ptNew.x != ptOld.x ||
@@ -608,6 +613,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	{
 		hctx = (HCTX)wParam;
 
+		gpWTPacketsGet(hctx,128,NULL);
 		bool entering = (HIWORD(lParam) != 0);
 
 		if (entering)
@@ -652,21 +658,21 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		
 		if (flag != 0)
 		{
-			STARTUPINFO si;
+			/*STARTUPINFO si;
 			PROCESS_INFORMATION pi;
 			ZeroMemory(&si, sizeof(si));
 			si.cb = sizeof(si);
 			ZeroMemory(&pi, sizeof(pi));
 			si.wShowWindow = SW_MAXIMIZE;
 			si.dwFlags |= STARTF_USESHOWWINDOW;
-			sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);
+			sprintf(mydirec, "explorer.exe %s", szCurrentDirectory);*/
 
 			penup.open(myfile2name, ios::app);
 			_stprintf(text3, _T("Pen UP-Down Count=%d\n"), cpenup);
 			_stprintf(text6, _T("No. of Pressure Points=%d pixels\n"), noofpressurepoints);
 			_stprintf(text7, _T("Elapsed Time(for drawing)=%lf seconds\n"), timeelap);
-			_stprintf(text5, _T("Average Speed=%lf pixels/sec\n"), speed);
-			_stprintf(text4, _T("Average Pen Pressure=%lf units\n"), avgpressure);
+			_stprintf(text5, _T("Weighted Average Speed=%lf pixels/sec\n"), speed);
+			_stprintf(text4, _T("Weighted Average Pen Pressure=%lf units\n"), avgpressure);
 
 
 			penup << "Automatic Report Generated for +" << myfilename << "+ and +" << myfile1name << "+\n";
@@ -682,7 +688,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			penup << "----------------";
 			penup.close();
 			//opening containing folder
-			CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+			//CreateProcess(NULL, _T(mydirec), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		}
 
 		_sleep(1000);
@@ -693,10 +699,10 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			Py_Initialize();
 			/*ops = fopen("op.py", "r");
 			PyRun_SimpleFile(ops, "op.py");*/
-			obj = Py_BuildValue("s", "dva.py");
+			obj = Py_BuildValue("s", "diag.py");
 			ops = _Py_fopen_obj(obj, "r+");
 			if (ops != NULL) {
-				PyRun_SimpleFile(ops, "dva.py");
+				PyRun_SimpleFile(ops, "diag.py");
 				/*killProcessByName("Wacom Feature Extractor.exe");*/  //not working yet
 			}
 			CloseTabletContexts();
@@ -722,6 +728,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 				POINT oldPoint = { ptOld.x, ptOld.y };
 				POINT newPoint = { ptNew.x, ptNew.y };
 
+
 				ScreenToClient(hWnd, &oldPoint);
 				ScreenToClient(hWnd, &newPoint);
 
@@ -731,6 +738,38 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 				DeleteObject(hPen);
 				SelectObject(hDC, original);
 				EndPaint(hWnd, &psPaint);
+			}
+
+			if (prsNew != 0)
+			{
+				noofpressurepoints++;
+				if (c < 1)
+				{
+					start = clock();
+					c++;
+				}
+				finish = clock();
+			}
+
+			if ((prsNew != 0) && (temp == 0))
+			{
+				cpenup++;
+			}
+
+			temp = prsNew;
+			pressureSum = pressureSum + prsNew;
+			//penup.open("penup.txt");
+			//_stprintf(text3, _T("Pen UP-Down Count=%d"), cpenup);
+			//penup << text3;
+			//penup.close();
+			_stprintf(text2, _T("%d"), prsNew);
+			if (flag == 1)
+			{
+				myfile1.open(myfile1name, ios::app);
+				myfile1 << text2;
+				myfile1 << ",";
+				myfile1 << "\n";
+				myfile1.close();
 			}
 		}
 		break;
