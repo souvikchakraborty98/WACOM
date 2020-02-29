@@ -35,12 +35,22 @@ def countdown(t):
         timefmt = '{:02d}:{:02d}'.format(mins, secs)
         print(timefmt, end='\r')
         time.sleep(1)
-        if msvcrt.kbhit() and msvcrt.getch() == chr(27).encode():
-            aborted=True
-            return True
-        elif msvcrt.kbhit() and msvcrt.getch() == chr(13).encode():
-            aborted=True
-            return False
+
+        if msvcrt.kbhit():
+            keypress=msvcrt.getch()
+            if keypress == chr(27).encode():
+              aborted=True
+              return True
+            elif keypress == chr(13).encode():
+              aborted=True
+              return False
+
+        # if msvcrt.kbhit() and msvcrt.getch() == chr(27).encode():
+        #     aborted=True
+        #     return True
+        # elif msvcrt.kbhit() and msvcrt.getch() == chr(13).encode():
+        #     aborted=True
+        #     return False
         t -= 1
         
 path = os.path.dirname(os.path.abspath(__file__))+"\\"
@@ -119,13 +129,66 @@ mplcursors.cursor(hover=True)
 plt.show()
 
 print("Launching 2 .csv data files and 1 .log file in..Press 'esc' to exit. Double-Tap 'Enter' to open now.")
+repNotGen=False
+repNotFound=False
+repAlreadyShown=False
 if countdown(6)!=True:
-   os.startfile(search)
-   os.startfile(filenamepress)
    try:
        os.startfile(filenamereport)
+       repAlreadyShown=True
    except:
-       print("No generated report found...press any key to exit.")
-       getch()
+       repNotFound=True
+       print("\n\nNo generated report found...Generate report? Y/N.\n")
+       consent=input()
+       if consent.lower()=="y":
+         noofcoordinates=0
+         with open(search,'r') as csvfile:
+           plots = csv.reader(csvfile, delimiter=',')
+           for row in plots:
+                 noofcoordinates+=1
+  
+         tempPress=0
+         cpenup=0
+         c=0
+         noofpressurepoints=0
+         pressureSum=0
+         with open(filenamepress,'r') as csvfile:
+           plots = csv.reader(csvfile, delimiter=',')
+           for row in plots:
+             if int(row[0])!=0 and tempPress==0:
+                 cpenup+=1
+             if int(row[0])!=0:
+                 noofpressurepoints+=1
+                 if c<1:
+                     start=time.time()
+                     c+=1
+                 finish=time.time()
+
+             tempPress=int(row[0])
+             pressureSum = pressureSum + int(row[0])
+  
+         elapsedtime=(finish-start)*10000
+         avgpressure = pressureSum/noofpressurepoints
+         avgspeed=noofcoordinates/elapsedtime
+         cisp=avgpressure*avgspeed
+
+         with open(filenamereport, 'w') as f:
+             f.write("Automatic Report Generated for +"+filenamecoord+"+ and +"+"Pressure Data Time_"+filenamecoord[21:len(filenamecoord)]+"+\n")
+             f.write("=======================================================================================================\n\n")
+             f.write("Pen UP-Down Count="+str(cpenup)+"\n")
+             f.write("Weighted Average Pen Pressure="+str(avgpressure)+" units\n")
+             f.write("Elapsed Time(for drawing)="+str(elapsedtime)+" seconds\n")
+             f.write("Weighted Average Speed="+str(avgspeed)+" pixels/sec\n")
+             f.write("No. of Pressure Points="+str(noofpressurepoints)+" pixels\n")
+             f.write("Composite Index of Speed and Pen-pressure="+str(cisp)+" pixels.units/sec\n\n")
+             f.write("----------------End Of File----------------")
+       else:
+           print("\nReport not generated.\n")
+           repNotGen=True
+
+   if repNotFound==True and repNotGen==False and repAlreadyShown==False:
+      os.startfile(filenamereport)
+   os.startfile(search)
+   os.startfile(filenamepress)
 else:
     print("Exiting...")

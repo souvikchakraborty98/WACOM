@@ -1,3 +1,4 @@
+print("Loading libraries. Please wait..", end=' ')
 import parselmouth
 import numpy as np
 import seaborn as sep
@@ -37,6 +38,8 @@ def countdown(t):
         t -= 1
 
 p = pyaudio.PyAudio()
+
+print("Done.\n")
 
 xb=input("Save as?\n")
 

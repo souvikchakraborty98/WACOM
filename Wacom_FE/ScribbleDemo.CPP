@@ -45,6 +45,7 @@ int cpenup = 0;
 long noofcordin = 0;
 long noofpressurepoints = 0;
 double avgpressure = 0.0;
+double cisp = 0.0;
 double speed = 0.0;
 double timeelap = 0.0;
 long pressureSum;
@@ -228,7 +229,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	);
 
 
-	/* If window could not be created, return "failure" */
+	/* If window could not be created, return FALSE */
 
 	if (!hWnd)
 	{
@@ -252,7 +253,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//myfile1.close();
 
 
-	/* Make the window visible; update its client area; and return "success" */
+	/* Make the window visible; update its client area; and return TRUE */
 
 	ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 	//ShowWindow(hWnd, nCmdShow);
@@ -434,8 +435,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	TCHAR text6[100] = { '\0' };
 	TCHAR text7[100] = { '\0' };
 	TCHAR text8[100] = { '\0' };
-	/*TCHAR text9[100] = { '\0' };
-	TCHAR text10[100] = { '\0' };*/
+	TCHAR text9[100] = { '\0' };
+	/*TCHAR text10[100] = { '\0' };*/
 
 	//getting working directory for data storage
 	/*DWORD nBufferLength = MAX_PATH;
@@ -594,7 +595,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 			// Add some delay to give driver a chance to catch up in configuring
 			// to the current attached tablets.  
-			// 1 second seems to work - your mileage may vary...
+			// 1 second seems to work - your mileage may vary...Mine works..
 			::Sleep(1000);
 
 			// re-enumerate attached tablets
@@ -654,6 +655,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			avgpressure = pressureSum / noofpressurepoints;
 			timeelap = (double)(finish - start) / CLOCKS_PER_SEC;
 			speed = noofcordin / timeelap;
+			cisp = speed * avgpressure;
 		}
 		
 		if (flag != 0)
@@ -673,6 +675,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			_stprintf(text7, _T("Elapsed Time(for drawing)=%lf seconds\n"), timeelap);
 			_stprintf(text5, _T("Weighted Average Speed=%lf pixels/sec\n"), speed);
 			_stprintf(text4, _T("Weighted Average Pen Pressure=%lf units\n"), avgpressure);
+			_stprintf(text9, _T("Composite Index of Speed and Pen-pressure=%lf pixels.units/sec\n"), cisp);
+		
 
 
 			penup << "Automatic Report Generated for +" << myfilename << "+ and +" << myfile1name << "+\n";
@@ -682,6 +686,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			penup << text7;
 			penup << text5;
 			penup << text6;
+			penup << text9;
 			penup << "\n";
 			penup << "----------------";
 			penup << "End Of File";
@@ -763,7 +768,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			//penup << text3;
 			//penup.close();
 			_stprintf(text2, _T("%d"), prsNew);
-			if (flag == 1)
+			if (flag == 1 && prsNew!=0)
 			{
 				myfile1.open(myfile1name, ios::app);
 				myfile1 << text2;
