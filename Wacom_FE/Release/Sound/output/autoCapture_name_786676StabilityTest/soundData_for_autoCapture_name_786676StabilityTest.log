@@ -1,0 +1,180 @@
+-----------------------------------------------------------------------------------------
+Pitch: Object type: Pitch
+Object name: <no name>
+Date: Wed Feb 19 02:08:37 2020
+
+Time domain:
+   Start time: 0 seconds
+   End time: 2.6149791666666666 seconds
+   Total duration: 2.6149791666666666 seconds
+Time sampling:
+   Number of frames: 258 (2 voiced)
+   Time step: 0.01 seconds
+   First frame centred at: 0.02248958333333328 seconds
+Ceiling at: 600 Hz
+
+Estimated quantiles:
+   10% = 514.063244 Hz = 362.962507 Mel = 28.3433504 semitones above 100 Hz = 10.473086 ERB
+   16% = 514.989716 Hz = 363.441179 Mel = 28.3745235 semitones above 100 Hz = 10.4849257 ERB
+   50% = 520.239721 Hz = 366.145815 Mel = 28.5501187 semitones above 100 Hz = 10.5517537 ERB
+   84% = 525.489727 Hz = 368.837215 Mel = 28.7239507 semitones above 100 Hz = 10.6181386 ERB
+   90% = 526.416198 Hz = 369.310804 Mel = 28.7544466 semitones above 100 Hz = 10.629808 ERB
+
+Estimated spreading:
+   84%-median = 7.425 Hz = 3.806 Mel = 0.2458 semitones = 0.09388 ERB
+   median-16% = 7.425 Hz = 3.825 Mel = 0.2483 semitones = 0.09451 ERB
+   90%-10% = 17.47 Hz = 8.978 Mel = 0.5814 semitones = 0.2216 ERB
+
+Minimum 516.379423 Hz = 364.158407 Mel = 28.4211782 semitones above 100 Hz = 10.5026589 ERB
+Maximum 524.100019 Hz = 368.126066 Mel = 28.6781059 semitones above 100 Hz = 10.6006089 ERB
+Range 7.721 Hz = 3.96765899 Mel = 0.2569 semitones = 0.09795 ERB
+Average: 520.239721 Hz = 366.142237 Mel = 28.5496421 semitones above 100 Hz = 10.5516339 ERB
+Standard deviation: 5.459 Hz = 2.806 Mel = 0.1817 semitones = 0.06926 ERB
+
+Mean absolute slope: 772.1 Hz/s = 396.8 Mel/s = 25.69 semitones/s = 9.795 ERB/s
+Mean absolute slope without octave jumps: 25.69 semitones/s
+
+-----------------------------------------------------------------------------------------
+Jitter:
+
+localJitter: 0.09221013347570538
+localabsoluteJitter: 0.00016970513190034398
+rapJitter: 0.054729305569315996
+ppq5Jitter: 0.05504260388852365
+ddpJitter: 0.164187916707948
+-----------------------------------------------------------------------------------------
+Shimmer:
+
+localShimmer: 0.18306329064824428
+localdbShimmer: 1.992267037941709
+apq3Shimmer: 0.06960812831010475
+aqpq5Shimmer: 0.08521717467780833
+apq11Shimmer: nan
+ddaShimmer: 0.20882438493031424
+-----------------------------------------------------------------------------------------
+Harmonicity (auto-correlation):  Object type: Harmonicity
+Object name: untitled
+Date: Wed Feb 19 02:08:37 2020
+
+Time domain:
+   Start time: 0 seconds
+   End time: 2.6149791666666666 seconds
+   Total duration: 2.6149791666666666 seconds
+Time sampling:
+   Number of frames: 250 (10 sounding)
+   Time step: 0.01 seconds
+   First frame centred at: 0.062489583333333314 seconds
+Periodicity-to-noise ratios of sounding frames:
+   Median 9.32901502 dB
+   10 % = 8.19063815 dB   90 %% = 10.2846556 dB
+   16 % = 8.24652984 dB   84 %% = 10.0892092 dB
+   25 % = 8.31018196 dB   75 %% = 10.0073179 dB
+Minimum: 8.14181891 dB
+Maximum: 10.4710029 dB
+Average: 9.27642767 dB
+Standard deviation: 0.852575038 dB
+
+-----------------------------------------------------------------------------------------
+Harmonicity (cross-correlation):  Object type: Harmonicity
+Object name: untitled
+Date: Wed Feb 19 02:08:37 2020
+
+Time domain:
+   Start time: 0 seconds
+   End time: 2.6149791666666666 seconds
+   Total duration: 2.6149791666666666 seconds
+Time sampling:
+   Number of frames: 259 (9 sounding)
+   Time step: 0.01 seconds
+   First frame centred at: 0.017489583333333388 seconds
+Periodicity-to-noise ratios of sounding frames:
+   Median 10.9391305 dB
+   10 % = 3.83530935 dB   90 %% = 19.047431 dB
+   16 % = 7.65715823 dB   84 %% = 17.0523681 dB
+   25 % = 9.13620937 dB   75 %% = 16.7912758 dB
+Minimum: 1.00431018 dB
+Maximum: 20.5252553 dB
+Average: 11.9580766 dB
+Standard deviation: 5.82013668 dB
+
+-----------------------------------------------------------------------------------------
+HNR: 11.958076645544493
+-----------------------------------------------------------------------------------------
+Glottal features and glottal based spectral features [formants]:
+ F1 : 
+---------
+[1632.7662387997996, 1641.8240745381377, 1682.4691531524252, 1743.6108575299108, 1813.0841249267517, 1870.9421651231714, 1905.186448249502, 1929.1892342750102, 1929.3349485329502, 1911.6692373673086, 1830.2794662395586]
+
+F2 : 
+---------
+[2592.811346150306, 2605.5472600616467, 2617.533387748624, 2626.5705676722064, 2629.5453447388472, 2620.8632868118348, 2612.3273794977817, 2603.606706247492, 2590.492990782452, 2570.1186566745005, 2531.3315891292314]
+
+F3 : 
+---------
+[3132.3666373906412, 3166.4767509611474, 3167.072863027429, 3165.5307289839757, 3191.399899048559, 3286.104884319847, 3316.905614837756, 3313.869032430086, 3254.967259900437, 3181.2219744853246, 3063.262655785886]
+
+F4 : 
+---------
+[4129.470582029546, 4140.967077197326, 4138.272682493149, 4144.027362363314, 4184.024064018053, 4388.240011916407, 4492.365056790008, 4545.667573938274, 4556.620146581565, 4547.940387316099, 4445.135342198465]
+
+Mean of Formants:
+-----------------------
+F1: 1808.2141771576842
+F2: 2600.068046864993
+F3: 3203.561663742826
+F4: 4337.520935167473
+-----------------------------------------------------------------------------------------
+MFCC: 
+-------
+  Object type: MFCC
+Object name: untitled
+Date: Wed Feb 19 02:08:37 2020
+
+Time domain:0 to 2.6149791666666666 seconds
+Number of frames: 517
+Time step: 0.005 seconds
+First frame at: 0.017489583333333333 seconds
+Maximum number of coefficients possible: 38
+Maximum number of coefficients used: 12
+Minimum frequency: 0 mel
+Maximum frequency: 4000 mel
+
+-----------------------------------------------------------------------------------------
+Formants: 
+-----------------------------------------------------------------------------------------
+Object:  Object type: Formant
+Object name: untitled
+Date: Wed Feb 19 02:08:37 2020
+
+Time domain:
+   Start time: 0 seconds
+   End time: 2.6149791666666666 seconds
+   Total duration: 2.6149791666666666 seconds
+Time sampling:
+   Number of frames: 1027
+   Time step: 0.0025 seconds
+   First frame centred at: 0.024989583333333343 seconds
+
+
+Matrix:  Object type: Matrix
+Object name: untitled
+Date: Wed Feb 19 02:08:37 2020
+
+xmin: 0
+xmax: 2.6149791666666666
+Number of columns: 1027
+dx: 0.0025 (-> sampling rate 400 )
+x1: 0.024989583333333343
+ymin: 1
+ymax: 1
+Number of rows: 1
+dy: 1 (-> sampling rate 1 )
+y1: 1
+Minimum value: 125.1346537392056
+Maximum value: 2598.3830153961753
+
+
+Quantile of Bandwidth : 450.1356296943404
+Mean : 893.9829633159009
+Standard Deviation: 363.02604436888686
+-----------------------------------------------------------------------------------------
