@@ -1,4 +1,0 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (.\Debug\) contains files shared from another project (ScribbleDemo.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
-  ScribbleDemo.CPP
-  ScribbleDemo.vcxproj -> C:\Users\Souvik\Documents\classes\PROJECT\Wacom\WACOM\Wacom_FE\.\Debug\Wacom Feature Extractor.exe
