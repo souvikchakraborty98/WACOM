@@ -30,18 +30,75 @@ def countdown(t):
     while t>-1 and aborted==False:
         mins, secs = divmod(t, 60)
         timefmt = '{:02d}:{:02d}'.format(mins, secs)
-        print(timefmt, end='\r')
+        print(timefmt+" secs. Press 'esc' to exit and show only data plots. Press 'Enter' to open now.", end='\r')
         time.sleep(1)
-        if msvcrt.kbhit() and msvcrt.getch() == chr(27).encode():
-            aborted=True
-            return True
+        if msvcrt.kbhit():
+            keypress=msvcrt.getch()
+            if keypress == chr(27).encode():
+              aborted=True
+              return True
+            elif keypress == chr(13).encode():
+              aborted=True
+              return False
         t -= 1
 
 p = pyaudio.PyAudio()
 
 print("Done.\n")
 
-xb=input("Save as?\n")
+path = os.path.dirname(os.path.abspath(__file__))+"\\output\\"
+
+if not os.path.exists(path):
+    os.makedirs(path)
+
+badOp=True
+while badOp==True:
+       try:
+          op=int(input("Type of recording?\nPress 1 for CG and 2 for PD.\n"))
+       except:
+           print("Bad Option\n")
+           continue
+       if op==1: 
+          #path to output/CG/foldername
+          foldernameCG=input("Enter folder name..\"PD\" is reserved!\n")
+          if foldernameCG.lower()=="pd":
+              print("Unauthorised")
+              getch()
+              exit()
+          path=path+"CG\\"+foldernameCG+"\\"
+          xb=input("Save as?\n")
+          if not os.path.exists(path):
+             os.makedirs(path)
+          badOp=False
+       elif op==2:
+          foldername=input("Enter folder name..\"CG\" is reserved!\n")
+          if foldername.lower()=="cg":
+              print("Unauthorised")
+              getch()
+              exit()
+          path=path+"PD\\"+foldername+"\\"
+          xb=input("Save as?\n")
+          if not os.path.exists(path):
+             os.makedirs(path)
+          #path to output/foldername/
+          badOp=False
+       else:
+           print("Bad Option\n")
+
+fcurmil="autoCapture"+"_name_"+str(datetime.datetime.now().strftime("%f"))+xb
+fn=fcurmil+".wav"
+
+mfccfn="MFCC_features_for_"+fcurmil+".DATA"
+mfccdata=os.path.join(path, mfccfn)
+
+formantfn="Formant_features_for_"+fcurmil+".DATA"
+formantmatrixSave=os.path.join(path,formantfn)
+
+if not os.path.exists(path):
+    os.makedirs(path)
+
+
+
 
 c=1
 for i in range(p.get_device_count()):
@@ -59,20 +116,6 @@ except:
      exit
 
 
-
-fcurmil="autoCapture"+"_name_"+str(datetime.datetime.now().strftime("%f"))+xb
-fn=fcurmil+".wav"
-
-path = os.path.dirname(os.path.abspath(__file__))+"\\output\\"+fcurmil
-
-mfccfn="MFCC_features_for_"+fcurmil+".DATA"
-mfccdata=os.path.join(path, mfccfn)
-
-formantfn="Formant_features_for_"+fcurmil+".DATA"
-formantmatrixSave=os.path.join(path,formantfn)
-
-if not os.path.exists(path):
-    os.makedirs(path)
 
 def is_silent(snd_data):
     return max(snd_data) < THRESHOLD
@@ -165,7 +208,7 @@ def record_to_file(path):
 if __name__ == '__main__':
     print("Listening..")    
     record_to_file(os.path.join(path, fn))
-    print("Done...Written to "+fn)
+    print("Done...Written to "+fn+"\n")
 
 
 sep.set()
@@ -328,6 +371,15 @@ with open(ops, 'w') as f:
     f.write("Quantile of Bandwidth : "+ str(formantsQB)+"\n"+ "Mean : "+str(formantsmean)+"\n"+"Standard Deviation: "+str(formantsSD)+"\n")
     f.write("-----------------------------------------------------------------------------------------\n")
 
+
+print("Launching 2 .DATA and 1 .log files, along with generated data plots in : \n")
+if countdown(20)!=True:
+   os.startfile(formantmatrixSave)
+   os.startfile(mfccdata)
+   os.startfile(ops)
+else:
+    print("Exiting...")
+
 plt.subplot(1,2,1)
 plt.title('Speech Signal Representation')
 plt.plot(snd.xs(), snd.values.T)
@@ -350,10 +402,4 @@ mng.window.state("zoomed")
 plt.show()
 f.close()
 
-print("Launching 2 .DATA and 1 .log files in..Press 'esc' to exit.")
-if countdown(6)!=True:
-   os.startfile(formantmatrixSave)
-   os.startfile(mfccdata)
-   os.startfile(ops)
-else:
-    print("Exiting...")
+

@@ -28,14 +28,22 @@ if is_admin():
            continue
        if op==1: 
           #path to MG_Data/CG/
-          foldernameCG=input("Enter folder name..\n")
+          foldernameCG=input("Enter folder name..\"PD\" is reserved!\n")
+          if foldernameCG.lower()=="pd":
+              print("Unauthorised")
+              getch()
+              exit()
           path=path+"CG\\"+foldernameCG+"\\"
           if not os.path.exists(path):
              os.makedirs(path)
           badOp=False
        elif op==2:
-          foldername=input("Enter folder name..\n")
-          path=path+foldername+"\\"
+          foldername=input("Enter folder name..\"CG\" is reserved!\n")
+          if foldername.lower()=="cg":
+              print("Unauthorised")
+              getch()
+              exit()
+          path=path+"PD\\"+foldername+"\\"
           if not os.path.exists(path):
              os.makedirs(path)
           #path to MG_Data/foldername/

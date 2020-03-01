@@ -16,11 +16,16 @@ def countdown(t):
     while t>-1 and aborted==False:
         mins, secs = divmod(t, 60)
         timefmt = '{:02d}:{:02d}'.format(mins, secs)
-        print(timefmt, end='\r')
+        print(timefmt+" secs. Press 'esc' to exit and show only data plots. Press 'Enter' to open now.", end='\r')
         time.sleep(1)
-        if msvcrt.kbhit() and msvcrt.getch() == chr(27).encode():
-            aborted=True
-            return True
+        if msvcrt.kbhit():
+            keypress=msvcrt.getch()
+            if keypress == chr(27).encode():
+              aborted=True
+              return True
+            elif keypress == chr(13).encode():
+              aborted=True
+              return False
         t -= 1
 
 def getListOfFiles(dirName):
@@ -43,29 +48,43 @@ if not os.path.exists(path):
 basepath = path
 
 listOfFiles = getListOfFiles(basepath)
-tnames=[]
+# tnames=[]
+# for i in listOfFiles:
+#     temp=i.split('\\')
+#     tnames.append(str(temp[len(temp)-1]))
+# for i in tnames:
+#     if i[len(i)-3:len(i)] == "wav":
+#           print(i)
+
+count=1
 for i in listOfFiles:
     temp=i.split('\\')
-    tnames.append(str(temp[len(temp)-1]))
-for i in tnames:
-    if i[len(i)-3:len(i)] == "wav":
-          print(i)
+    tempFn=str(temp[len(temp)-1])
+    if tempFn[len(tempFn)-3:len(tempFn)] == "wav":
+      print("\n------------------------------------------------------------------------------------------------------------------------------------\n")  
+      print(str(count)+") Filename: "+tempFn+" :--\n")
+      count+=1
+      print("Copy this:- "+i+"\n")
 
 print("\n\nEnter .wav files to display. 🛈 Copy filenames from above and paste them below.")
 search=input()
-path=path+"\\"+search[0:-4]
+filenamelist=search.split("\\")
+filenamenew=filenamelist[len(filenamelist)-1]
+pathnew=""
+for i in range(len(filenamelist)-1):
+    pathnew=pathnew+filenamelist[i]+"\\"
 
-sfn="soundData"+"_for_"+search[0:-4]+".log"
-ops=os.path.join(path, sfn)
+sfn="soundData"+"_for_"+filenamenew[0:-4]+".log"
+ops=os.path.join(pathnew, sfn)
 
-mfccfn="MFCC_features_for_"+search[0:-4]+".DATA"
-mfccdata=os.path.join(path, mfccfn)
+mfccfn="MFCC_features_for_"+filenamenew[0:-4]+".DATA"
+mfccdata=os.path.join(pathnew, mfccfn)
 
-formantfn="Formant_features_for_"+search[0:-4]+".DATA"
-formantmatrixSave=os.path.join(path,formantfn)
+formantfn="Formant_features_for_"+filenamenew[0:-4]+".DATA"
+formantmatrixSave=os.path.join(pathnew,formantfn)
 
 try:
-    snd = parselmouth.Sound(os.path.join(path, search))
+    snd = parselmouth.Sound(search)
 except:
     print("\nFile not found/Not a .wav file")
     print("Press any key to exit")
@@ -103,6 +122,25 @@ spectrogram = pre_emphasized_snd.to_spectrogram(window_length=0.03, maximum_freq
 # with open(ops, 'w') as f:
 #     f.write('-----------------------------------------------------------------------------------------\n')
 #     print('About:', pitch, file=f)
+print("Launching 2 .DATA and 1 .log files, along with generated data plots in : \n")
+if countdown(20)!=True:
+  try:
+      os.startfile(formantmatrixSave)
+  except:
+      pass
+  try:
+      os.startfile(mfccdata)
+  except:
+      pass
+  try:
+      os.startfile(ops)
+  except:
+      pass
+    
+    
+   
+else:
+    print("Exiting...")
 
 plt.subplot(1,2,1)
 plt.title('Speech Signal Representation')
@@ -125,11 +163,5 @@ mng=plt.get_current_fig_manager()
 mng.window.state("zoomed")
 plt.show()
 
-print("Launching 2 .DATA and 1 .log files in..Press 'esc' to exit.")
-if countdown(6)!=True:
-   os.startfile(formantmatrixSave)
-   os.startfile(mfccdata)
-   os.startfile(ops)
-else:
-    print("Exiting...")
+
 

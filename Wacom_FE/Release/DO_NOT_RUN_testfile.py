@@ -3,6 +3,8 @@ import csv
 import os
 import mplcursors
 from celluloid import Camera
+import turtle
+import math
 
 # x = []
 # y = []
@@ -53,8 +55,23 @@ from celluloid import Camera
 # plt.show()
 
 # #os.startfile("Wacom Feature Extractor.exe")
-x=["Wacom Feature Extractor.exe","sadva","vaef"]
+# x=["Wacom Feature Extractor.exe","sadva","vaef"]
 
-if "Wacom Feature Extractor.exe" in x:
-     print("dawd")
+# if "Wacom Feature Extractor.exe" in x:
+#      print("dawd")
+spiral=turtle.Turtle()
+
+wn=turtle.Screen()
+spiral.color("blue")
+wn.setup(1366,768)
+spiral.ht()
+spiral.penup()
+for i in range(121):
+    t = i / 20 * math.pi
+    x = (1 + 18 * t) * math.cos(t)
+    y = (1 + 18 * t) * math.sin(t)
+    spiral.goto(x, y)
+    spiral.dot(5)
+spiral.up()
+turtle.Screen().exitonclick()
 
