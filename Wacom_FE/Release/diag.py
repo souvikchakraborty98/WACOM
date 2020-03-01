@@ -4,86 +4,102 @@ import os
 import mplcursors
 import time
 import msvcrt
+import shutil
 from msvcrt import getch
+import ctypes
+import sys
 
-x = []
-y = []
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
 
-path = os.path.dirname(os.path.abspath(__file__))+"\\"
+if is_admin():        
+ x = []
+ y = []
 
-data=""
-f = open("filename.log", "r")
+ path = os.path.dirname(os.path.abspath(__file__))+"\\"
 
-for z in f:
-    data=data+z
+ if not os.path.exists(path):
+      os.makedirs(path)
 
-# def countdown(t):
-#     aborted=False
-#     while t>-1 and aborted==False:
-#         mins, secs = divmod(t, 60)
-#         timefmt = '{:02d}:{:02d}'.format(mins, secs)
-#         print(timefmt, end='\r')
-#         time.sleep(1)
-#         if msvcrt.kbhit() and msvcrt.getch() == chr(27).encode():
-#             aborted=True
-#             return True
-#         t -= 1
+ data=""
+ with open("filename.log", "r") as f:
+    for z in f:
+     data=data+z
+
+
         
-filenamelist=data.split("+")
-filenamecoord=filenamelist[0]
-filenamepress=filenamelist[1]
-filenamereport=path+"Report Generated Time_"+filenamecoord[21:len(filenamecoord)-3]+"log"
+ filenamelist=data.split("+")
+ filenamecoord=filenamelist[0]
+ filenamepress=filenamelist[1]
+ filenamereport="Report Generated Time_"+filenamecoord[21:len(filenamecoord)-3]+"log"
 
-try:    
+
+ datanew=""
+ with open("moveFn.log",'r') as moveFn:
+      for z in moveFn:
+        datanew=datanew+z
+
+ filenamelistnew=datanew.split("+")
+ filenamecoordNew=filenamelistnew[0]+filenamecoord
+ filenamepressNew=filenamelistnew[1]+filenamepress
+ filenamereportNew=filenamelistnew[2]+filenamereport
+
+ 
+ try:    
   with open(filenamecoord,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         x.append(int(row[0]))
         y.append(int(row[1]))
-except:
+ except:
     print("Access Error")
     getch()
 
-plt.subplot(2,1,1)
-plt.plot(x,y,'o',label='Pressure Points')
-plt.plot(x,y,'-k',label='Tip movement')
-ax = plt.gca()
-ax.set_ylim(ax.get_ylim()[::-1])
-plt.xlabel('x pixels')
-plt.ylabel('y pixels')
-plt.title('Coordinate data Scatter plot')
-plt.tight_layout(pad=0.4)
-plt.legend()
+ plt.subplot(2,1,1)
+ plt.plot(x,y,'o',label='Pressure Points')
+ plt.plot(x,y,'-k',label='Tip movement')
+ ax = plt.gca()
+ ax.set_ylim(ax.get_ylim()[::-1])
+ plt.xlabel('x pixels')
+ plt.ylabel('y pixels')
+ plt.title('Coordinate data Scatter plot')
+ plt.tight_layout(pad=0.4)
+ plt.legend()
 
-x = []
+ x = []
 
-with open(filenamepress,'r') as csvfile:
+ with open(filenamepress,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         x.append(int(row[0]))
 
-plt.subplot(2,1,2)
-plt.plot(x, label='xy plot')
-plt.xlabel('Coordinate plot pressure points (x)')
-plt.ylabel('Pressure (y)')
-plt.title('Presssure data 2D plot')
-plt.legend()
-plt.tight_layout(pad=0.4)
+ plt.subplot(2,1,2)
+ plt.plot(x, label='xy plot')
+ plt.xlabel('Coordinate plot pressure points (x)')
+ plt.ylabel('Pressure (y)')
+ plt.title('Presssure data 2D plot')
+ plt.legend()
+ plt.tight_layout(pad=0.4)
 
 
-mng=plt.get_current_fig_manager()
-mng.window.state("zoomed")
-mplcursors.cursor(hover=True)
+ mng=plt.get_current_fig_manager()
+ mng.window.state("zoomed")
+ mplcursors.cursor(hover=True)
 
-plt.draw()
-#os.startfile("Wacom Feature Extractor.exe")
+ plt.draw()
 
-#print("Launching 2 .csv data files in..Press 'esc' to exit.")
-#if countdown(6)!=True:
-os.startfile(filenamecoord)
-os.startfile(filenamepress)
-os.startfile(filenamereport)
-#else:
-#print("Exiting...")
 
-plt.show()
+ shutil.move(filenamecoord, filenamecoordNew)
+ shutil.move(filenamepress, filenamepressNew)
+ shutil.move(filenamereport,filenamereportNew)
+ 
+ os.startfile(filenamecoordNew)
+ os.startfile(filenamepressNew)
+ os.startfile(filenamereportNew)
+
+ plt.show()
+else:
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1) # change the 4th param to "" later (.exe)

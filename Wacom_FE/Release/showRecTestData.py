@@ -33,7 +33,7 @@ def countdown(t):
     while t>-1 and aborted==False:
         mins, secs = divmod(t, 60)
         timefmt = '{:02d}:{:02d}'.format(mins, secs)
-        print(timefmt, end='\r')
+        print(timefmt+" secs. Press 'esc' to exit and show only data plots. Press 'Enter' to open now.", end='\r')
         time.sleep(1)
 
         if msvcrt.kbhit():
@@ -91,48 +91,12 @@ except:
     print("\nCoordinate file not found\nPress any key to exit..")
     getch()
     exit()
-plt.subplot(2,1,1)
-plt.plot(x,y,'o',label='Pressure Points')
-plt.plot(x,y,'-k',label='Tip movement')
-ax = plt.gca()
-ax.set_ylim(ax.get_ylim()[::-1])
-plt.xlabel('x pixels')
-plt.ylabel('y pixels')
-plt.title('Coordinate data Scatter plot')
-plt.tight_layout(pad=0.4)
-plt.legend()
 
-x = []
-
-try:
-    with open(filenamepress,'r') as csvfile:
-        plots = csv.reader(csvfile, delimiter=',')
-        for row in plots:
-            x.append(int(row[0]))
-except:
-    print("\nPressure file not found\nPress any key to exit..")
-    getch()
-    exit()
-
-plt.subplot(2,1,2)
-plt.plot(x, label='xy plot')
-plt.xlabel('Coordinate plot pressure points (x)')
-plt.ylabel('Pressure (y)')
-plt.title('Presssure data 2D plot')
-plt.legend()
-plt.tight_layout(pad=0.4)
-
-
-mng=plt.get_current_fig_manager()
-mng.window.state("zoomed")
-mplcursors.cursor(hover=True)
-plt.show()
-
-print("Launching 2 .csv data files and 1 .log file in..Press 'esc' to exit. Double-Tap 'Enter' to open now.")
+print("Launching 2 .csv data files and 1 .log file, along with generated data plots in :\n ")
 repNotGen=False
 repNotFound=False
 repAlreadyShown=False
-if countdown(6)!=True:
+if countdown(20)!=True:
    try:
        os.startfile(filenamereport)
        repAlreadyShown=True
@@ -192,3 +156,42 @@ if countdown(6)!=True:
    os.startfile(filenamepress)
 else:
     print("Exiting...")
+
+plt.subplot(2,1,1)
+plt.plot(x,y,'o',label='Pressure Points')
+plt.plot(x,y,'-k',label='Tip movement')
+ax = plt.gca()
+ax.set_ylim(ax.get_ylim()[::-1])
+plt.xlabel('x pixels')
+plt.ylabel('y pixels')
+plt.title('Coordinate data Scatter plot')
+plt.tight_layout(pad=0.4)
+plt.legend()
+
+x = []
+
+try:
+    with open(filenamepress,'r') as csvfile:
+        plots = csv.reader(csvfile, delimiter=',')
+        for row in plots:
+            x.append(int(row[0]))
+except:
+    print("\nPressure file not found\nPress any key to exit..")
+    getch()
+    exit()
+
+plt.subplot(2,1,2)
+plt.plot(x, label='xy plot')
+plt.xlabel('Coordinate plot pressure points (x)')
+plt.ylabel('Pressure (y)')
+plt.title('Presssure data 2D plot')
+plt.legend()
+plt.tight_layout(pad=0.4)
+
+
+mng=plt.get_current_fig_manager()
+mng.window.state("zoomed")
+mplcursors.cursor(hover=True)
+plt.show()
+
+

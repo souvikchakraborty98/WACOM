@@ -1,0 +1,4 @@
+ARCH Guided Spiral: append GS at last
+Repeat Letters (10 times) : append RL at last
+Copy Sentence (if possible) : append CS at last
+Switching letters (switch between two letters 10) :append SL at last 

@@ -1,0 +1,3 @@
+/a : 'ah' 4 times (append _a)
+/u : 'you' 4 times (append _u)
+/m : 'om' 4 times (append _m)
