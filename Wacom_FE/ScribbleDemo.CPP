@@ -82,14 +82,14 @@ std::map<HCTX, TabletInfo> gContextMap;
 //
 typedef enum
 {
-	PenColorRed,
-	PenColorGreen,
-	PenColorBlue,
+	PenColorBlack,
+	PenColorDeepGreen,
+	PenColorDeepBlue,
 
 	MAX_PEN_COLOR
 } EPenColor;
 
-EPenColor gNextPenColor = PenColorGreen;
+EPenColor gNextPenColor = PenColorBlack;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Global variables
@@ -349,9 +349,9 @@ BOOL static NEAR OpenTabletContexts(HWND hWnd)
 
 				switch (gNextPenColor)
 				{
-				case PenColorRed:		penColor = RGB(255, 0, 0);	gNextPenColor = PenColorGreen; break;
-				case PenColorGreen:	penColor = RGB(0, 255, 0);	gNextPenColor = PenColorBlue; break;
-				case PenColorBlue:	penColor = RGB(0, 0, 255);	gNextPenColor = PenColorRed; break;
+				case PenColorBlack:		penColor = RGB(0, 0, 0);	gNextPenColor = PenColorDeepGreen; break;
+				case PenColorDeepGreen:	penColor = RGB(0, 51, 0);	gNextPenColor = PenColorDeepBlue; break;
+				case PenColorDeepBlue:	penColor = RGB(0, 0, 102);	gNextPenColor = PenColorBlack; break;
 				default:
 					WACOM_ASSERT(!"Bad pen color");
 				}
@@ -515,7 +515,6 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		}
 
 		//WacomTrace("mousePos: [%i,%i]\n", xMousePos, yMousePos);
-			//whoever tries to copy this code uski maa ki....
 		break;
 
 	case WT_PACKET:
