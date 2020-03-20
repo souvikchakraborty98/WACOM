@@ -25,10 +25,10 @@ IDI_MYICON              ICON                    "C:/Users/Souvik/Documents/class
 
 SCRIBBLEDEMOMENU MENU
 BEGIN
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&About Wacom Feature Extractor...", IDM_ABOUT
-    END
+POPUP "&Help"
+BEGIN
+MENUITEM "&About Wacom Feature Extractor...", IDM_ABOUT
+END
 END
 
 
@@ -41,11 +41,11 @@ ABOUTBOX DIALOGEX 22, 17, 161, 75
 CAPTION "About Wacom Feature Extractor"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CTEXT           "Wacom Feature Extractor",-1,0,3,161,8
-    CTEXT           "Modified By Souvik Chakraborty",-1,0,12,161,8
-    CTEXT           "From LCS/Telegraphics",-1,0,28,161,8
-    CTEXT           "Version 3.4.2.8",-1,0,41,161,8
-    DEFPUSHBUTTON   "OK",IDOK,65,57,32,14
+CTEXT           "Wacom Feature Extractor", -1, 0, 3, 161, 8
+CTEXT           "Modified By Souvik Chakraborty", -1, 0, 12, 161, 8
+CTEXT           "From LCS/Telegraphics", -1, 0, 28, 161, 8
+CTEXT           "Version 3.4.2.8", -1, 0, 41, 161, 8
+DEFPUSHBUTTON   "OK", IDOK, 65, 57, 32, 14
 END
 
 
@@ -55,20 +55,20 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
-    "resource.h\0"
+"resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
-    "\0"
+"\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
-    "\r\n"
-    "\0"
+"\r\n"
+"\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -82,10 +82,10 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    "ABOUTBOX", DIALOG
-    BEGIN
-        TOPMARGIN, 3
-    END
+"ABOUTBOX", DIALOG
+BEGIN
+TOPMARGIN, 3
+END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -97,7 +97,7 @@ END
 
 ABOUTBOX AFX_DIALOG_LAYOUT
 BEGIN
-    0
+0
 END
 
 
@@ -107,35 +107,35 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,5,2,8
- PRODUCTVERSION 3,4,2,8
- FILEFLAGSMASK 0x3fL
+FILEVERSION 3, 5, 2, 8
+PRODUCTVERSION 3, 4, 2, 8
+FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x1L
+FILEFLAGS 0x1L
 #else
- FILEFLAGS 0x0L
+FILEFLAGS 0x0L
 #endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
+FILEOS 0x40004L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "400904b0"
-        BEGIN
-            VALUE "FileDescription", "Micrographia Data"
-            VALUE "FileVersion", "3.5.2.8"
-            VALUE "InternalName", "WaFex.exe"
-            VALUE "LegalCopyright", "Souvik Chakraborty (C) 2020"
-            VALUE "OriginalFilename", "Wacom Feature Extractor.exe"
-            VALUE "ProductName", "Wacom Feature Extractor"
-            VALUE "ProductVersion", "3.4.2.8"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x4009, 1200
-    END
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "400904b0"
+BEGIN
+VALUE "FileDescription", "Micrographia Data"
+VALUE "FileVersion", "3.5.2.8"
+VALUE "InternalName", "WaFex.exe"
+VALUE "LegalCopyright", "Souvik Chakraborty (C) 2020"
+VALUE "OriginalFilename", "Wacom Feature Extractor.exe"
+VALUE "ProductName", "Wacom Feature Extractor"
+VALUE "ProductVersion", "3.4.2.8"
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x4009, 1200
+END
 END
 
 #endif    // English (India) resources
@@ -152,4 +152,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

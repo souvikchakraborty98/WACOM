@@ -469,7 +469,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			myfile1 << "Pressure Data\n";
 			myfile1.close();
 		}*/
-		if(flag==0)
+		if (flag == 0)
 		{
 			ShowError("No Data files were created");
 		}
@@ -498,7 +498,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	case WM_MOUSEMOVE:
 		xMousePos = GET_X_LPARAM(lParam);
 		yMousePos = GET_Y_LPARAM(lParam);
-		
+
 		if ((flag == 1) && (prsNew > 0))
 		{
 			_stprintf(text, _T("%d"), xMousePos);
@@ -613,7 +613,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	{
 		hctx = (HCTX)wParam;
 
-		gpWTPacketsGet(hctx,128,NULL);
+		gpWTPacketsGet(hctx, 128, NULL);
 		bool entering = (HIWORD(lParam) != 0);
 
 		if (entering)
@@ -656,7 +656,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			speed = noofcordin / timeelap;
 			cisp = speed * avgpressure;
 		}
-		
+
 		if (flag != 0)
 		{
 			/*STARTUPINFO si;
@@ -675,7 +675,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			_stprintf(text5, _T("Weighted Average Speed=%lf pixels/sec\n"), speed);
 			_stprintf(text4, _T("Weighted Average Pen Pressure=%lf units\n"), avgpressure);
 			_stprintf(text9, _T("Composite Index of Speed and Pen-pressure=%lf pixels.units/sec\n"), cisp);
-		
+
 
 
 			penup << "Automatic Report Generated for +" << myfilename << "+ and +" << myfile1name << "+\n";
@@ -697,22 +697,22 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 		_sleep(1000);
 
-			filenameDataOut.open("filename.log");
-			filenameDataOut << myfilename << "+" << myfile1name;
-			filenameDataOut.close();
-			Py_Initialize();
-			/*ops = fopen("op.py", "r");
-			PyRun_SimpleFile(ops, "op.py");*/
-			obj = Py_BuildValue("s", "diag.py");
-			ops = _Py_fopen_obj(obj, "r+");
-			if (ops != NULL) {
-				PyRun_SimpleFile(ops, "diag.py");
-				/*killProcessByName("Wacom Feature Extractor.exe");*/  //not working yet
-			}
-			CloseTabletContexts();
-			PostQuitMessage(0);
-			Py_Finalize();
-	
+		filenameDataOut.open("filename.log");
+		filenameDataOut << myfilename << "+" << myfile1name;
+		filenameDataOut.close();
+		Py_Initialize();
+		/*ops = fopen("op.py", "r");
+		PyRun_SimpleFile(ops, "op.py");*/
+		obj = Py_BuildValue("s", "diag.py");
+		ops = _Py_fopen_obj(obj, "r+");
+		if (ops != NULL) {
+			PyRun_SimpleFile(ops, "diag.py");
+			/*killProcessByName("Wacom Feature Extractor.exe");*/  //not working yet
+		}
+		CloseTabletContexts();
+		PostQuitMessage(0);
+		Py_Finalize();
+
 
 		break;
 
@@ -767,7 +767,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 			//penup << text3;
 			//penup.close();
 			_stprintf(text2, _T("%d"), prsNew);
-			if (flag == 1 && prsNew!=0)
+			if (flag == 1 && prsNew != 0)
 			{
 				myfile1.open(myfile1name, ios::app);
 				myfile1 << text2;

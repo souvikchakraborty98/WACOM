@@ -1,0 +1,16 @@
+-----------------------------------------------------------------------------------------
+Dump :
+  Object type: MFCC
+Object name: untitled
+Date: Tue Feb 18 19:08:01 2020
+
+Time domain:0 to 7.467097505668934 seconds
+Number of frames: 1488
+Time step: 0.005 seconds
+First frame at: 0.01604875283446688 seconds
+Maximum number of coefficients possible: 37
+Maximum number of coefficients used: 12
+Minimum frequency: 0 mel
+Maximum frequency: 3900 mel
+
+-----------------------------------------------------------------------------------------

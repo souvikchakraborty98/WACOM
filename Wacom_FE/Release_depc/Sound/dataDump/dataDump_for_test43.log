@@ -1,0 +1,25 @@
+-----------------------------------------------------------------------------------------
+Dump :
+  Object type: Harmonicity
+Object name: untitled
+Date: Mon Feb 17 02:08:03 2020
+
+Time domain:
+   Start time: 0 seconds
+   End time: 4.839183673469388 seconds
+   Total duration: 4.839183673469388 seconds
+Time sampling:
+   Number of frames: 482 (122 sounding)
+   Time step: 0.01 seconds
+   First frame centred at: 0.014591836734693883 seconds
+Periodicity-to-noise ratios of sounding frames:
+   Median 9.48635605 dB
+   10 % = -1.65180462 dB   90 %% = 17.4632245 dB
+   16 % = -0.032776457 dB   84 %% = 16.3514665 dB
+   25 % = 1.85880008 dB   75 %% = 14.6813851 dB
+Minimum: -8.10063757 dB
+Maximum: 22.2489358 dB
+Average: 8.40740824 dB
+Standard deviation: 7.47304312 dB
+
+-----------------------------------------------------------------------------------------

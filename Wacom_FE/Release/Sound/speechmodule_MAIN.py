@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import mplcursors
 import datetime
 import os
+import subprocess
 
 from sys import byteorder
 from array import array
@@ -16,7 +17,6 @@ import statistics
 import time
 import msvcrt
 from msvcrt import getch
-
 
 THRESHOLD = 2500
 CHUNK_SIZE = 1024
@@ -102,10 +102,15 @@ if not os.path.exists(path):
 
 c=1
 for i in range(p.get_device_count()):
-  if p.get_device_info_by_index(i).get('maxInputChannels')>0 and '@' not in p.get_device_info_by_index(i).get('name') and int(p.get_device_info_by_index(i).get('hostApi'))==0 and p.get_device_info_by_index(i).get('name')!="Microsoft Sound Mapper - Input":
-    print(str(c)+") "+str(p.get_device_info_by_index(i)))
-    c+=1
-    print("\n\n")
+  if p.get_device_count()!=0:
+    if p.get_device_info_by_index(i).get('maxInputChannels')>0 and '@' not in p.get_device_info_by_index(i).get('name') and int(p.get_device_info_by_index(i).get('hostApi'))==0 and p.get_device_info_by_index(i).get('name')!="Microsoft Sound Mapper - Input":
+        print(str(c)+") "+str(p.get_device_info_by_index(i)))
+        c+=1
+        print("\n\n")
+  else:
+      print("No IP Devices found.")
+      getch()
+      exit()
 
 
 try:
@@ -374,10 +379,10 @@ with open(ops, 'w') as f:
 
 print("Launching 2 .DATA and 1 .log files, along with generated data plots in : \n")
 if countdown(20)!=True:
-   os.startfile(formantmatrixSave)
-   os.startfile(mfccdata)
-   os.startfile(ops)
-else:
+   subprocess.Popen(["notepad.exe", formantmatrixSave])
+   subprocess.Popen(["notepad.exe", mfccdata])
+   subprocess.Popen(["notepad.exe", ops])
+else: 
     print("Exiting...")
 
 plt.subplot(1,2,1)
