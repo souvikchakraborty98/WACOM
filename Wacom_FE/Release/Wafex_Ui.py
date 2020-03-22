@@ -1,4 +1,4 @@
-import PyQt5,os
+import PyQt5
 from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib import pyplot as plt
 
@@ -9,6 +9,7 @@ pFlag=False
 cFlagMG=False
 cFlagSpeech=False
 recordMGFlag=False
+recordRunning=False
 
 class External2(QtCore.QThread):
     signal = QtCore.pyqtSignal('PyQt_PyObject')
@@ -16,6 +17,8 @@ class External2(QtCore.QThread):
     def __init__(self, Tname):
         self.Tname=Tname
         QtCore.QThread.__init__(self)
+        global recordRunning
+        recordRunning=True
 
     def run(self):        
         p = pyaudio.PyAudio() 
@@ -128,6 +131,8 @@ class External2(QtCore.QThread):
         
         print("Listening..")    
         record_to_file(self,os.path.join(pathSound, fn))
+        global recordRunning
+        recordRunning=False
         print("Done...Written to "+os.path.join(pathSound, fn)+"\n")
         
         
@@ -325,6 +330,8 @@ class External2(QtCore.QThread):
         self.signal.emit("#end")
 
     def stop(self):
+        global recordRunning
+        recordRunning=False
         self.terminate()
 
 
@@ -469,12 +476,15 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
         self.updateThresholdBtn.setText("Update Threshold")
     
     def closeEvent(self, evnt):
-        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to stop recording?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        if close == QtWidgets.QMessageBox.Yes:
-            super(Ui_DialogRecAudio, self).closeEvent(evnt)
-            self.newThread.stop()
+        if recordRunning==True:
+            close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to stop recording?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if close == QtWidgets.QMessageBox.Yes:
+                super(Ui_DialogRecAudio, self).closeEvent(evnt)
+                self.newThread.stop()
+            else:
+                evnt.ignore()
         else:
-            evnt.ignore()
+            super(Ui_DialogRecAudio, self).closeEvent(evnt)
     
     def updateThresholdBtnCLicked(self):
         th=self.inputThreshold.text()
@@ -494,6 +504,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
         self.newThread = External2(testname)
         self.newThread.signal.connect(self.updateThreshUI)
         self.recordAudioBtn.setEnabled(False)
+        self.TestName.setEnabled(False)
         self.recordAudioBtn.setText("Listening..")
         self.newThread.start()
 
@@ -506,6 +517,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
         elif result=="#end":
             self.recordAudioBtn.setText("Record")
             self.recordAudioBtn.setEnabled(True)
+            self.TestName.setEnabled(True)
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -901,7 +913,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     
     def exit_message(self):
         close = QtWidgets.QMessageBox.information(self,"Info","Data saved to project folder.\nFor folder structure refer documentation.", QtWidgets.QMessageBox.Ok)
-        close.setWindowIcon('logo.ico')
         if close == QtWidgets.QMessageBox.Ok:
             sys.exit()
 
@@ -1105,6 +1116,7 @@ if __name__ == "__main__":
         import mplcursors
         import datetime
         import subprocess
+        import os
         from sys import byteorder
         from array import array
         from struct import pack
