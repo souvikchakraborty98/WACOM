@@ -1,22 +1,6 @@
 import PyQt5,os
 from PyQt5 import QtCore, QtGui, QtWidgets
-from msvcrt import getch
-import wmi
-import time
-from time import sleep
-import parselmouth
-import numpy as np
-import seaborn as sep
-import pyaudio
-import wave
 from matplotlib import pyplot as plt
-import mplcursors
-import datetime
-import subprocess
-from sys import byteorder
-from array import array
-from struct import pack
-import statistics
 
 path=""
 selMG=""
@@ -24,14 +8,7 @@ selSpeech=""
 pFlag=False
 cFlagMG=False
 cFlagSpeech=False
-
-CHUNK_SIZE = 1024
-CHANNELS=1
-FORMAT = pyaudio.paInt16 # 16 bit res
-RATE = 48000
-THRESHOLD = 3200
-INPUT_DEVICE_IN=1
-
+recordMGFlag=False
 
 class External2(QtCore.QThread):
     signal = QtCore.pyqtSignal('PyQt_PyObject')
@@ -372,20 +349,25 @@ class External(QtCore.QThread):
         os.startfile("Wacom Feature Extractor.exe")
         listener=[]
         running=True
-    
+
         while running==True:
              c = wmi.WMI ()
-             for process in c.Win32_Process ():
+             print("\n\ncalled wmi\n\n")
+             for process in c.Win32_process(): 
                 p=str(process.Name)
+                print(p)
                 try:
                   if p=="Wacom Feature Extractor.exe":
                      listener.append(p)
+                     print("\n\nfound\n\n")
+                     break
                 except Exception as e:
                          print(e)
                          pass
             
              if "Wacom Feature Extractor.exe" in listener:
-                 print("WFE running..",end="\r") 
+                 print("WFE running..",end="\r")
+                 self.signal.emit("Extracting...") 
                  listener.clear()   
              else:
                  running=False
@@ -744,9 +726,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioControl.setGeometry(QtCore.QRect(30, 310, 61, 17))
         self.radioControl.setObjectName("radioControl")
         self.radioControl.toggled.connect(self.onClickedControl)
+        self.radioControl.toggled.connect(lambda:self.btnstate(self.radioControl))
         self.radioParkinson = QtWidgets.QRadioButton(self.centralwidget)
         self.radioParkinson.setGeometry(QtCore.QRect(90, 310, 82, 17))
         self.radioParkinson.toggled.connect(self.onClickedParkinson)
+        self.radioParkinson.toggled.connect(lambda:self.btnstate(self.radioParkinson))
         self.radioParkinson.setObjectName("radioParkinson")
         self.ProjName = QtWidgets.QLabel(self.centralwidget)
         self.ProjName.setGeometry(QtCore.QRect(20, 160, 221, 20))
@@ -779,9 +763,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioControl2 = QtWidgets.QRadioButton(self.centralwidget)
         self.radioControl2.setGeometry(QtCore.QRect(30, 440, 61, 17))
         self.radioControl2.setObjectName("radioControl2")
+        self.radioControl2.toggled.connect(lambda:self.btnstate2(self.radioControl2))
         self.radioParkinson2 = QtWidgets.QRadioButton(self.centralwidget)
         self.radioParkinson2.setGeometry(QtCore.QRect(90, 440, 82, 17))
         self.radioParkinson2.setObjectName("radioParkinson2")
+        self.radioParkinson2.toggled.connect(lambda:self.btnstate2(self.radioParkinson2))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 658, 21))
@@ -840,7 +826,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def recordSP(self):
      dlg = Ui_DialogRecAudio()
      dlg.exec_()
-        
+
+    def btnstate(self,b):
+        if b.text() == "Control":
+            if b.isChecked() == False:
+                self.recordMG.setEnabled(False)
+        elif b.text() == "Parkinson's":
+            if b.isChecked() == False:
+                self.recordMG.setEnabled(False)
+    
+    def btnstate2(self,b):
+        if b.text() == "Control":
+            if b.isChecked() == False:
+                self.recordSpeech.setEnabled(False)
+        elif b.text() == "Parkinson's":
+            if b.isChecked() == False:
+                self.recordSpeech.setEnabled(False)
+
     def close_application(self):
         close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to close the window?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if close == QtWidgets.QMessageBox.Yes:
@@ -882,7 +884,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             selMG="CG"
             global cFlagMG
             cFlagMG=True
-            if pFlag==True:
+            if pFlag==True and recordMGFlag==False:
               self.recordMG.setEnabled(True)
 
 
@@ -894,7 +896,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             selMG="PD"
             global cFlagMG
             cFlagMG=True
-            if pFlag==True:
+            if pFlag==True and recordMGFlag==False:
               self.recordMG.setEnabled(True)
 
 
@@ -978,6 +980,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
     def recordMGData(self):
+            global recordMGFlag
+            recordMGFlag=True
             self.WacExtStatus.setText("Extractor Running")
             self.recordMG.setEnabled(False)
             self.actionNew_Project.setEnabled(False)
@@ -988,18 +992,81 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
              
                 
     def finished(self, result):
-        self.WacExtStatus.setText(str(result))
-        if(str(result)=="Extractor Stopped"):
-            self.recordMG.setEnabled(True)
+        if str(result)=="Extractor Stopped":
+            self.WacExtStatus.setText(str(result))
+        elif str(result)=="Extracting...":
+            self.WacExtStatus.setText(str(result))
+        if str(result)=="Extractor Stopped":
+            if self.radioControl.isChecked()==False and self.radioParkinson.isChecked()==False:
+                self.recordMG.setEnabled(False)
+            else:
+                self.recordMG.setEnabled(True)
             self.actionNew_Project.setEnabled(True)
-            self.actionOpen_Project.setEnabled(True) 
+            self.actionOpen_Project.setEnabled(True)
+            global recordMGFlag
+            recordMGFlag=False
 
 
 if __name__ == "__main__":
     import sys
+    import time
+    from time import sleep
     app = QtWidgets.QApplication(sys.argv)
+    pixmap = QtGui.QPixmap("splash.jpg")
+    splash = QtWidgets.QSplashScreen(pixmap,QtCore.Qt.WindowStaysOnTopHint)
+    splash.show()
+    splash.showMessage("<h3><font color='white'>Intialiasing...</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+    sleep(2)
+    splash.showMessage("<h3><font color='white'>Loading..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+    sleep(1)
+    app.processEvents()
+    try:
+        from msvcrt import getch
+        import wmi
+        splash.showMessage("<h3><font color='white'>Loading module wmi..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("WMI")
+        sleep(1)
+        import parselmouth
+        splash.showMessage("<h3><font color='white'>Loading module parselmouth..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("Parselmouth")
+        sleep(2)
+        import numpy as np
+        splash.showMessage("<h3><font color='white'>Loading module numpy..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("Numpy")
+        import seaborn as sep
+        splash.showMessage("<h3><font color='white'>Loading module seaborn..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("Seaborn")
+        import pyaudio
+        splash.showMessage("<h3><font color='white'>Loading module pyaudio..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("PyAudio")
+        import wave
+        splash.showMessage("<h3><font color='white'>Loading module wave..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("Wave")
+        import mplcursors
+        import datetime
+        import subprocess
+        from sys import byteorder
+        from array import array
+        from struct import pack
+        import statistics
+        splash.showMessage("<h3><font color='white'>Loading module statistics..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+        print("Statistics") 
+    except Exception as e:
+        print(e) 
+        splash.showMessage("<h3><font color='white'>Error loading modules.</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
+
+
+    CHUNK_SIZE = 1024
+    CHANNELS=1
+    FORMAT = pyaudio.paInt16 # 16 bit res
+    RATE = 48000
+    THRESHOLD = 3200
+    INPUT_DEVICE_IN=1
+
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    splash.showMessage("<h3><font color='white'>Done.</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
     MainWindow.show()
+    splash.finish(MainWindow)
     sys.exit(app.exec_())
