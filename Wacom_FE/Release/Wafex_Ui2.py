@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'Wafex_UI.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.0
+#
+# WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -46,29 +54,29 @@ class Ui_MainWindow(object):
         self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_6.setObjectName("line_6")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(26, 132, 81, 16))
+        self.label_2.setGeometry(QtCore.QRect(26, 132, 85, 16))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.line_7 = QtWidgets.QFrame(self.centralwidget)
-        self.line_7.setGeometry(QtCore.QRect(108, 140, 152, 3))
+        self.line_7.setGeometry(QtCore.QRect(114, 140, 145, 3))
         self.line_7.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_7.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_7.setObjectName("line_7")
         self.line_8 = QtWidgets.QFrame(self.centralwidget)
-        self.line_8.setGeometry(QtCore.QRect(252, 140, 16, 50))
+        self.line_8.setGeometry(QtCore.QRect(252, 140, 16, 88))
         self.line_8.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_8.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_8.setObjectName("line_8")
         self.line_9 = QtWidgets.QFrame(self.centralwidget)
-        self.line_9.setGeometry(QtCore.QRect(2, 140, 16, 50))
+        self.line_9.setGeometry(QtCore.QRect(2, 140, 16, 88))
         self.line_9.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_9.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_9.setObjectName("line_9")
         self.line_10 = QtWidgets.QFrame(self.centralwidget)
-        self.line_10.setGeometry(QtCore.QRect(10, 190, 250, 3))
+        self.line_10.setGeometry(QtCore.QRect(10, 228, 250, 3))
         self.line_10.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_10.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_10.setObjectName("line_10")
@@ -258,7 +266,7 @@ class Ui_MainWindow(object):
         self.radioParkinson.setGeometry(QtCore.QRect(90, 310, 82, 17))
         self.radioParkinson.setObjectName("radioParkinson")
         self.ProjName = QtWidgets.QLabel(self.centralwidget)
-        self.ProjName.setGeometry(QtCore.QRect(20, 160, 221, 20))
+        self.ProjName.setGeometry(QtCore.QRect(20, 160, 221, 61))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(10)
@@ -267,6 +275,7 @@ class Ui_MainWindow(object):
         self.ProjName.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ProjName.setLineWidth(1)
         self.ProjName.setText("")
+        self.ProjName.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.ProjName.setObjectName("ProjName")
         self.WacExtStatus = QtWidgets.QLabel(self.centralwidget)
         self.WacExtStatus.setGeometry(QtCore.QRect(30, 330, 208, 20))
@@ -317,6 +326,8 @@ class Ui_MainWindow(object):
         self.actionNew_Project.setObjectName("actionNew_Project")
         self.actionOpen_Project = QtWidgets.QAction(MainWindow)
         self.actionOpen_Project.setObjectName("actionOpen_Project")
+        self.actionAbout_Qt = QtWidgets.QAction(MainWindow)
+        self.actionAbout_Qt.setObjectName("actionAbout_Qt")
         self.menuFile.addAction(self.actionNew_Project)
         self.menuFile.addAction(self.actionOpen_Project)
         self.menuFile.addSeparator()
@@ -325,6 +336,7 @@ class Ui_MainWindow(object):
         self.menuPreferences.addAction(self.actionAudio_Device_selection)
         self.menuPreferences.addAction(self.actionGeneral)
         self.menuAbout.addAction(self.actionAbout)
+        self.menuAbout.addAction(self.actionAbout_Qt)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuPreferences.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
@@ -336,7 +348,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label.setText(_translate("MainWindow", "Device Status"))
-        self.label_2.setText(_translate("MainWindow", "Project Name"))
+        self.label_2.setText(_translate("MainWindow", "Project Details"))
         self.label_3.setText(_translate("MainWindow", "Data Acquisition"))
         self.label_4.setText(_translate("MainWindow", "Micrographia"))
         self.label_5.setText(_translate("MainWindow", "Speech"))
@@ -356,9 +368,10 @@ class Ui_MainWindow(object):
         self.actionPre_recorded_Instructions.setText(_translate("MainWindow", "Pre-recorded Instructions"))
         self.actionAudio_Device_selection.setText(_translate("MainWindow", "Audio Device Selection"))
         self.actionGeneral.setText(_translate("MainWindow", "General"))
-        self.actionAbout.setText(_translate("MainWindow", "About.."))
+        self.actionAbout.setText(_translate("MainWindow", "About PDFE"))
         self.actionNew_Project.setText(_translate("MainWindow", "New Project.."))
         self.actionOpen_Project.setText(_translate("MainWindow", "Open Project.."))
+        self.actionAbout_Qt.setText(_translate("MainWindow", "About Qt"))
 
 
 if __name__ == "__main__":

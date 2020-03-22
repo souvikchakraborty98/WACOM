@@ -324,6 +324,9 @@ class External2(QtCore.QThread):
         f.close()
         self.signal.emit("#end")
 
+    def stop(self):
+        self.terminate()
+
 
 
 class External(QtCore.QThread):
@@ -376,6 +379,33 @@ class External(QtCore.QThread):
         print("\nWFE now stopped.")
         self.signal.emit("Extractor Stopped")
 
+
+class Ui_DialogAbout(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        QtWidgets.QDialog.__init__(self,parent)
+        self.setupUi(self)
+
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("DialogAbout")
+        Dialog.resize(283, 201)
+        Dialog.setWindowIcon(QtGui.QIcon('logo.ico'))
+        Dialog.setFixedSize(Dialog.size())
+        self.label = QtWidgets.QLabel(Dialog)
+        self.label.setGeometry(QtCore.QRect(26, 22, 41, 16))
+        self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel(Dialog)
+        self.label_2.setGeometry(QtCore.QRect(30, 52, 211, 121))
+        self.label_2.setObjectName("label_2")
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "About"))
+        self.label.setText(_translate("Dialog", "About"))
+        self.label_2.setText(_translate("Dialog", "#ABOUT HERE#"))
+
 class Ui_DialogRecAudio(QtWidgets.QDialog):
     def __init__(self,parent=None):
         QtWidgets.QDialog.__init__(self,parent)
@@ -385,6 +415,8 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
         Dialog.setObjectName("DialogRecAudio")
         Dialog.resize(331, 380)
         Dialog.setWindowIcon(QtGui.QIcon('mic.ico'))
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        Dialog.setFixedSize(Dialog.size())
         self.updateThresholdBtn = QtWidgets.QPushButton(Dialog)
         self.updateThresholdBtn.setGeometry(QtCore.QRect(180, 60, 101, 23))
         self.updateThresholdBtn.setObjectName("updateThresholdBtn")
@@ -414,8 +446,9 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
         self.label_thres = QtWidgets.QLabel(Dialog)
         self.label_thres.setGeometry(QtCore.QRect(180, 10, 50, 13))
         self.label_thres.setObjectName("label_thres")
-        Dialog.setFixedSize(Dialog.size())
+
         self.retranslateUi(Dialog)
+
         self.inputThreshold.setInputMask("9999")
         self.updateThresholdBtn.clicked.connect(self.updateThresholdBtnCLicked)
         self.recordAudioBtn.clicked.connect(self.recordBtnClicked)
@@ -434,6 +467,14 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
 
     def thresholdUpdated(self):
         self.updateThresholdBtn.setText("Update Threshold")
+    
+    def closeEvent(self, evnt):
+        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to stop recording?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if close == QtWidgets.QMessageBox.Yes:
+            super(Ui_DialogRecAudio, self).closeEvent(evnt)
+            self.newThread.stop()
+        else:
+            evnt.ignore()
     
     def updateThresholdBtnCLicked(self):
         th=self.inputThreshold.text()
@@ -516,29 +557,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_6.setObjectName("line_6")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(26, 132, 81, 16))
+        self.label_2.setGeometry(QtCore.QRect(26, 132, 85, 16))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.line_7 = QtWidgets.QFrame(self.centralwidget)
-        self.line_7.setGeometry(QtCore.QRect(108, 140, 152, 3))
+        self.line_7.setGeometry(QtCore.QRect(114, 140, 145, 3))
         self.line_7.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_7.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_7.setObjectName("line_7")
         self.line_8 = QtWidgets.QFrame(self.centralwidget)
-        self.line_8.setGeometry(QtCore.QRect(252, 140, 16, 50))
+        self.line_8.setGeometry(QtCore.QRect(252, 140, 16, 88))
         self.line_8.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_8.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_8.setObjectName("line_8")
         self.line_9 = QtWidgets.QFrame(self.centralwidget)
-        self.line_9.setGeometry(QtCore.QRect(2, 140, 16, 50))
+        self.line_9.setGeometry(QtCore.QRect(2, 140, 16, 88))
         self.line_9.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_9.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_9.setObjectName("line_9")
         self.line_10 = QtWidgets.QFrame(self.centralwidget)
-        self.line_10.setGeometry(QtCore.QRect(10, 190, 250, 3))
+        self.line_10.setGeometry(QtCore.QRect(10, 228, 250, 3))
         self.line_10.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_10.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_10.setObjectName("line_10")
@@ -733,7 +774,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioParkinson.toggled.connect(lambda:self.btnstate(self.radioParkinson))
         self.radioParkinson.setObjectName("radioParkinson")
         self.ProjName = QtWidgets.QLabel(self.centralwidget)
-        self.ProjName.setGeometry(QtCore.QRect(20, 160, 221, 20))
+        self.ProjName.setGeometry(QtCore.QRect(20, 160, 221, 61))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -742,7 +783,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.ProjName.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ProjName.setLineWidth(1)
         self.ProjName.setText("")
-        self.ProjName.setAlignment(QtCore.Qt.AlignCenter)
+        self.ProjName.setAlignment(QtCore.Qt.AlignLeft)
         self.ProjName.setWordWrap(True)
         self.ProjName.setObjectName("ProjName")
         self.WacExtStatus = QtWidgets.QLabel(self.centralwidget)
@@ -783,7 +824,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.actionExit = QtWidgets.QAction(MainWindow)
-        self.actionExit.triggered.connect(self.close_application)
         self.actionExit.setObjectName("actionExit")
         self.actionPre_recorded_Instructions = QtWidgets.QAction(MainWindow)
         self.actionPre_recorded_Instructions.setObjectName("actionPre_recorded_Instructions")
@@ -797,9 +837,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionNew_Project.setObjectName("actionNew_Project")
         self.actionOpen_Project = QtWidgets.QAction(MainWindow)
         self.actionOpen_Project.setObjectName("actionOpen_Project")
+        self.actionAbout_Qt = QtWidgets.QAction(MainWindow)
+        self.actionAbout_Qt.setObjectName("actionAbout_Qt")
         self.menuFile.addAction(self.actionNew_Project)
-        self.actionNew_Project.triggered.connect(self.new_project)
-        self.actionOpen_Project.triggered.connect(self.open_project)
         self.menuFile.addAction(self.actionOpen_Project)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
@@ -807,11 +847,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.menuPreferences.addAction(self.actionAudio_Device_selection)
         self.menuPreferences.addAction(self.actionGeneral)
         self.menuAbout.addAction(self.actionAbout)
+        self.menuAbout.addAction(self.actionAbout_Qt)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuPreferences.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
 
+        self.actionNew_Project.triggered.connect(self.new_project)
+        self.actionOpen_Project.triggered.connect(self.open_project)
+        self.actionExit.triggered.connect(self.close_application)
+        self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
+        self.actionAbout.triggered.connect(self.dialogAbout)
+
         self.retranslateUi(MainWindow)
+
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         app.aboutToQuit.connect(self.exit_message)
         self.recordMG.clicked.connect(self.recordMGData)
@@ -820,12 +868,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioControl2.toggled.connect(self.onClickedControl2)
         self.radioParkinson2.toggled.connect(self.onClickedParkinson2)
         self.WacExtStatus.setText("Extractor Stopped")
-        MainWindow.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinimizeButtonHint)
+        MainWindow.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinimizeButtonHint | QtCore.Qt.WindowTitleHint)
         MainWindow.setFixedSize(MainWindow.size())
     
     def recordSP(self):
-     dlg = Ui_DialogRecAudio()
-     dlg.exec_()
+     Ui_DialogRecAudio().exec_()
+     
+
+    def dialogAbout(self):
+     Ui_DialogAbout().exec_()
 
     def btnstate(self,b):
         if b.text() == "Control":
@@ -844,12 +895,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.recordSpeech.setEnabled(False)
 
     def close_application(self):
-        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to close the window?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to exit?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if close == QtWidgets.QMessageBox.Yes:
             sys.exit()
     
     def exit_message(self):
         close = QtWidgets.QMessageBox.information(self,"Info","Data saved to project folder.\nFor folder structure refer documentation.", QtWidgets.QMessageBox.Ok)
+        close.setWindowIcon('logo.ico')
         if close == QtWidgets.QMessageBox.Ok:
             sys.exit()
 
@@ -916,11 +968,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             fnName=path+"/"+tempFn
             print(fnName)
             with open(fnName,'w') as proj:
-                proj.write(str(fnName))
+                proj.write(str(fnName)+"#")
+                proj.write(str(datetime.datetime.now().strftime("%c")+"#"))
+                proj.write(str(datetime.datetime.now().strftime("%f"))+"#")
+
             
             # temp=str(fileName).split('/')
             # tempFn=str(temp[len(temp)-1])
-            self.ProjName.setText(tempFn[0:-6])
+            self.ProjName.setText("Name: "+tempFn[0:-6]+"\n"+"Date: "+str(datetime.datetime.now().strftime("%c"))+"\n"+"ID: "+str(datetime.datetime.now().strftime("%f")))
             global pFlag
             pFlag=True
             if cFlagMG==True:
@@ -938,10 +993,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
           with open(fileName, "r") as f:
              for z in f:
                  data=data+z      
-            
-          temp=str(data).split('/')
+          
+          temp1=str(data).split('#')
+          temp=str(temp1[0]).split('/')
           tempFn=str(temp[len(temp)-1])
-          self.ProjName.setText(tempFn[0:-6])
+          self.ProjName.setText("Name: "+tempFn[0:-6]+"\n"+"Date: "+temp1[1]+"\n"+"ID: "+temp1[2])
           global pFlag
           pFlag=True
           if cFlagMG==True:
@@ -954,7 +1010,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "WaFex"))
         self.label.setText(_translate("MainWindow", "Device Status"))
-        self.label_2.setText(_translate("MainWindow", "Project Name"))
+        self.label_2.setText(_translate("MainWindow", "Project Details"))
         self.label_3.setText(_translate("MainWindow", "Data Acquisition"))
         self.label_4.setText(_translate("MainWindow", "Micrographia"))
         self.label_5.setText(_translate("MainWindow", "Speech"))
@@ -971,12 +1027,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionPre_recorded_Instructions.setText(_translate("MainWindow", "Pre-recorded Instructions"))
         self.actionAudio_Device_selection.setText(_translate("MainWindow", "Audio Device Selection"))
         self.actionGeneral.setText(_translate("MainWindow", "General"))
-        self.actionAbout.setText(_translate("MainWindow", "About.."))
+        self.actionAbout.setText(_translate("MainWindow", "About PDFE"))
         self.actionNew_Project.setText(_translate("MainWindow", "New Project.."))
         self.actionOpen_Project.setText(_translate("MainWindow", "Open Project.."))
         self.recordSpeech.setText(_translate("MainWindow", "Record.."))
         self.radioControl2.setText(_translate("MainWindow", "Control"))
         self.radioParkinson2.setText(_translate("MainWindow", "Parkinson\'s"))
+        self.actionAbout_Qt.setText(_translate("MainWindow", "About Qt"))
 
 
     def recordMGData(self):
@@ -1006,33 +1063,36 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             global recordMGFlag
             recordMGFlag=False
 
+class PWindow(QtWidgets.QMainWindow):
+    def closeEvent(self,event):
+       close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to exit?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+       if close == QtWidgets.QMessageBox.Yes:
+            event.accept()
+       else:
+            event.ignore()  
+
 
 if __name__ == "__main__":
     import sys
-    import time
-    from time import sleep
     app = QtWidgets.QApplication(sys.argv)
     pixmap = QtGui.QPixmap("splash.jpg")
     splash = QtWidgets.QSplashScreen(pixmap,QtCore.Qt.WindowStaysOnTopHint)
     splash.show()
     splash.showMessage("<h3><font color='white'>Intialiasing...</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
-    sleep(2)
     splash.showMessage("<h3><font color='white'>Loading..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
-    sleep(1)
     app.processEvents()
     try:
         from msvcrt import getch
+        import datetime
+        import time
+        from time import sleep
         import wmi
         splash.showMessage("<h3><font color='white'>Loading module wmi..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
         print("WMI")
-        sleep(1)
         import parselmouth
         splash.showMessage("<h3><font color='white'>Loading module parselmouth..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
         print("Parselmouth")
-        sleep(2)
         import numpy as np
-        splash.showMessage("<h3><font color='white'>Loading module numpy..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
-        print("Numpy")
         import seaborn as sep
         splash.showMessage("<h3><font color='white'>Loading module seaborn..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
         print("Seaborn")
@@ -1063,7 +1123,8 @@ if __name__ == "__main__":
     THRESHOLD = 3200
     INPUT_DEVICE_IN=1
 
-    MainWindow = QtWidgets.QMainWindow()
+    # MainWindow = QtWidgets.QMainWindow()
+    MainWindow=PWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     splash.showMessage("<h3><font color='white'>Done.</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
