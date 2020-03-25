@@ -135,7 +135,6 @@ class External2(QtCore.QThread):
         recordRunning=False
         print("Done...Written to "+os.path.join(pathSound, fn)+"\n")
         
-        
 
         sep.set()
         snd = parselmouth.Sound((os.path.join(pathSound, fn)))
@@ -356,7 +355,11 @@ class External(QtCore.QThread):
                 moveFn.write(filenamecoordNew+"+"+filenamepressNew+"+"+filenamereportNew)
 
         print("\nFolders created..Starting WFE...\n")
-        os.startfile("Wacom Feature Extractor.exe")
+        try:
+            os.startfile("Wacom Feature Extractor.exe")
+        except Exception as e:
+                self.signal.emit("Error")
+                
         listener=[]
         running=True
 
@@ -385,6 +388,9 @@ class External(QtCore.QThread):
         
         print("\nWFE now stopped.")
         self.signal.emit("Extractor Stopped")
+    
+    def stop(self):
+        self.terminate()
 
 
 class Ui_DialogAbout(QtWidgets.QDialog):
@@ -421,7 +427,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("DialogRecAudio")
         Dialog.resize(331, 380)
-        Dialog.setWindowIcon(QtGui.QIcon('mic.ico'))
+        Dialog.setWindowIcon(QtGui.QIcon('mic.png'))
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Dialog.setFixedSize(Dialog.size())
         self.updateThresholdBtn = QtWidgets.QPushButton(Dialog)
@@ -1060,19 +1066,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
              
                 
     def finished(self, result):
-        if str(result)=="Extractor Stopped":
-            self.WacExtStatus.setText(str(result))
-        elif str(result)=="Extracting...":
-            self.WacExtStatus.setText(str(result))
-        if str(result)=="Extractor Stopped":
+        global recordMGFlag
+        if str(result)=="Error":
+            self.newThread.stop()
             if self.radioControl.isChecked()==False and self.radioParkinson.isChecked()==False:
                 self.recordMG.setEnabled(False)
             else:
                 self.recordMG.setEnabled(True)
             self.actionNew_Project.setEnabled(True)
             self.actionOpen_Project.setEnabled(True)
-            global recordMGFlag
+            self.WacExtStatus.setText("Extractor Stopped")
             recordMGFlag=False
+        elif str(result)=="Extractor Stopped":
+            self.WacExtStatus.setText(str(result))
+            if self.radioControl.isChecked()==False and self.radioParkinson.isChecked()==False:
+                self.recordMG.setEnabled(False)
+            else:
+                self.recordMG.setEnabled(True)
+            self.actionNew_Project.setEnabled(True)
+            self.actionOpen_Project.setEnabled(True)
+            recordMGFlag=False
+        elif str(result)=="Extracting...":
+            self.WacExtStatus.setText(str(result))
+            
 
 class PWindow(QtWidgets.QMainWindow):
     def closeEvent(self,event):

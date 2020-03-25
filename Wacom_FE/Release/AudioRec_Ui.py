@@ -13,6 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
+        Dialog.setWindowModality(QtCore.Qt.NonModal)
         Dialog.resize(331, 380)
         self.updateThresholdBtn = QtWidgets.QPushButton(Dialog)
         self.updateThresholdBtn.setGeometry(QtCore.QRect(180, 60, 101, 23))
@@ -27,7 +28,7 @@ class Ui_Dialog(object):
         self.label_at.setGeometry(QtCore.QRect(20, 110, 121, 16))
         self.label_at.setObjectName("label_at")
         self.recordAudioBtn = QtWidgets.QPushButton(Dialog)
-        self.recordAudioBtn.setGeometry(QtCore.QRect(20, 60, 75, 23))
+        self.recordAudioBtn.setGeometry(QtCore.QRect(20, 60, 100, 23))
         self.recordAudioBtn.setObjectName("recordAudioBtn")
         self.TestName = QtWidgets.QLineEdit(Dialog)
         self.TestName.setGeometry(QtCore.QRect(20, 30, 113, 20))
