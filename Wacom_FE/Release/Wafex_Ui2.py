@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Wafex_UI.ui'
+# Form implementation generated from reading ui file '.\Wafex_UI.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -270,12 +270,12 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(10)
+        font.setItalic(True)
         self.ProjName.setFont(font)
         self.ProjName.setFrameShape(QtWidgets.QFrame.Box)
         self.ProjName.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ProjName.setLineWidth(1)
-        self.ProjName.setText("")
-        self.ProjName.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.ProjName.setAlignment(QtCore.Qt.AlignCenter)
         self.ProjName.setObjectName("ProjName")
         self.WacExtStatus = QtWidgets.QLabel(self.centralwidget)
         self.WacExtStatus.setGeometry(QtCore.QRect(30, 330, 208, 20))
@@ -358,6 +358,7 @@ class Ui_MainWindow(object):
         self.recordMG.setText(_translate("MainWindow", "Record"))
         self.radioControl.setText(_translate("MainWindow", "Control"))
         self.radioParkinson.setText(_translate("MainWindow", "Parkinson\'s"))
+        self.ProjName.setText(_translate("MainWindow", "No projects opened."))
         self.recordSpeech.setText(_translate("MainWindow", "Record.."))
         self.radioControl2.setText(_translate("MainWindow", "Control"))
         self.radioParkinson2.setText(_translate("MainWindow", "Parkinson\'s"))

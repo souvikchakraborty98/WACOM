@@ -714,6 +714,7 @@
      <font>
       <family>Times New Roman</family>
       <pointsize>10</pointsize>
+      <italic>true</italic>
      </font>
     </property>
     <property name="frameShape">
@@ -726,10 +727,10 @@
      <number>1</number>
     </property>
     <property name="text">
-     <string/>
+     <string>No projects opened.</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="WacExtStatus">

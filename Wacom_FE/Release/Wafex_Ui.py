@@ -10,8 +10,11 @@ cFlagMG=False
 cFlagSpeech=False
 recordMGFlag=False
 recordRunning=False
+IpDevCurrentInd=0
+OpDevCurrentInd=0
 
-class External2(QtCore.QThread):
+
+class SpeechWorker(QtCore.QThread):
     signal = QtCore.pyqtSignal('PyQt_PyObject')
 
     def __init__(self, Tname):
@@ -77,7 +80,7 @@ class External2(QtCore.QThread):
 
         def record(self):
             try:
-                stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, output=True, frames_per_buffer=CHUNK_SIZE, input_device_index=INPUT_DEVICE_IN)
+                stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, output=True, frames_per_buffer=CHUNK_SIZE, input_device_index=INPUT_DEVICE_IND)
             except Exception as e:
                 print(str(e)+"\nPress any key to exit")
                 getch()
@@ -298,13 +301,11 @@ class External2(QtCore.QThread):
 
 
         print("Launching 2 .DATA and 1 .log files, along with generated data plots in : \n")
-        # if countdown(20)!=True:
+        
         subprocess.Popen(["notepad.exe", formantmatrixSave])
         subprocess.Popen(["notepad.exe", mfccdata])
         subprocess.Popen(["notepad.exe", ops])
-        # else: 
-        #     print("Exiting...")
-
+       
         plt.subplot(1,2,1)
         plt.title('Speech Signal Representation')
         plt.plot(snd.xs(), snd.values.T)
@@ -335,7 +336,7 @@ class External2(QtCore.QThread):
 
 
 
-class External(QtCore.QThread):
+class MGWorker(QtCore.QThread):
     signal = QtCore.pyqtSignal('PyQt_PyObject')
 
     def __init__(self):
@@ -392,6 +393,35 @@ class External(QtCore.QThread):
     def stop(self):
         self.terminate()
 
+class playTestSoundWorker(QtCore.QThread):
+    signal = QtCore.pyqtSignal('PyQt_PyObject')
+
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+
+    def run(self):    
+        filename = 'appRes/tone.wav'
+        chunk = 256  
+        wf = wave.open(filename, 'rb')
+        p = pyaudio.PyAudio()
+        stream = p.open(format = p.get_format_from_width(wf.getsampwidth()), channels = wf.getnchannels(), rate = wf.getframerate(),output_device_index=OUTPUT_DEVICE_IND, output = True)
+        data = wf.readframes(chunk)
+        try:
+            while data != b'':
+                stream.write(data)
+                data = wf.readframes(chunk)
+        except:
+            pass
+        
+        wf.close()
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+        self.signal.emit("Stopped")
+    
+    def stop(self):
+        self.terminate()
+
 
 class Ui_DialogAbout(QtWidgets.QDialog):
     def __init__(self,parent=None):
@@ -401,7 +431,7 @@ class Ui_DialogAbout(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("DialogAbout")
         Dialog.resize(283, 201)
-        Dialog.setWindowIcon(QtGui.QIcon('logo.ico'))
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/logo.ico'))
         Dialog.setFixedSize(Dialog.size())
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(26, 22, 41, 16))
@@ -409,6 +439,7 @@ class Ui_DialogAbout(QtWidgets.QDialog):
         self.label_2 = QtWidgets.QLabel(Dialog)
         self.label_2.setGeometry(QtCore.QRect(30, 52, 211, 121))
         self.label_2.setObjectName("label_2")
+        self.label_2.setOpenExternalLinks(True)
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -417,7 +448,189 @@ class Ui_DialogAbout(QtWidgets.QDialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "About"))
         self.label.setText(_translate("Dialog", "About"))
-        self.label_2.setText(_translate("Dialog", "#ABOUT HERE#"))
+        self.label_2.setText(_translate("Dialog", "<a href=\"https://github.com/souvikchakraborty98/WACOM/blob/master/README.md\">README</a>"))
+
+
+class Ui_DialogAudioDevSel(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        QtWidgets.QDialog.__init__(self,parent)
+        self.setupUi(self)
+        self.listIPDev()
+        self.listOPDev()
+        
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(400, 300)
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        Dialog.setFixedSize(Dialog.size())
+        self.buttonBox_audio = QtWidgets.QDialogButtonBox(Dialog)
+        self.buttonBox_audio.setGeometry(QtCore.QRect(30, 240, 341, 32))
+        self.buttonBox_audio.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox_audio.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox_audio.setObjectName("buttonBox_audio")
+        self.comboBox_audio_in = QtWidgets.QComboBox(Dialog)
+        self.comboBox_audio_in.setGeometry(QtCore.QRect(40, 70, 231, 22))
+        self.comboBox_audio_in.setObjectName("comboBox_audio_in")
+        self.comboBox_audio_in.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
+        self.label_audio_in = QtWidgets.QLabel(Dialog)
+        self.label_audio_in.setGeometry(QtCore.QRect(40, 30, 51, 16))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_audio_in.setFont(font)
+        self.label_audio_in.setObjectName("label_audio_in")
+        self.label_audio_out = QtWidgets.QLabel(Dialog)
+        self.label_audio_out.setGeometry(QtCore.QRect(40, 110, 61, 16))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_audio_out.setFont(font)
+        self.label_audio_out.setObjectName("label_audio_out")
+        self.comboBox_audio_out = QtWidgets.QComboBox(Dialog)
+        self.comboBox_audio_out.setGeometry(QtCore.QRect(40, 140, 231, 22))
+        self.comboBox_audio_out.setObjectName("comboBox_audio_out")
+        self.comboBox_audio_out.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
+        self.refreshBtn = QtWidgets.QPushButton(Dialog)
+        self.refreshBtn.setGeometry(QtCore.QRect(350, 10, 31, 31))
+        self.refreshBtn.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("appRes/refresh.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.refreshBtn.setIcon(icon)
+        self.refreshBtn.setObjectName("refreshBtn")
+        self.PlayBtnTest = QtWidgets.QPushButton(Dialog)
+        self.PlayBtnTest.setGeometry(QtCore.QRect(284, 140, 31, 23))
+        self.PlayBtnTest.setText("")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("appRes/Play.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.PlayBtnTest.setIcon(icon1)
+        self.PlayBtnTest.setObjectName("PlayBtnTest")
+
+        self.retranslateUi(Dialog)
+
+        self.buttonBox_audio.accepted.connect(Dialog.accept)
+        self.buttonBox_audio.rejected.connect(Dialog.reject)
+        self.refreshBtn.clicked.connect(self.refreshDevList)
+        self.PlayBtnTest.clicked.connect(self.testDevSound)
+        self.comboBox_audio_in.activated.connect(self.ipSel)
+        self.comboBox_audio_out.activated.connect(self.opSel)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Audio Device Selection"))
+        self.label_audio_in.setText(_translate("Dialog", "Audio In:"))
+        self.label_audio_out.setText(_translate("Dialog", "Audio Out:"))
+
+    def testDevSound(self):
+        self.newThread = playTestSoundWorker()
+        self.newThread.signal.connect(self.testSoundPlayStopped)
+        self.newThread.start()
+
+
+    def testSoundPlayStopped(self,result):
+        # self.newThread.stop()
+         print('Test Play Stopped')
+        
+        
+    def closeEvent(self, evnt):
+         super(Ui_DialogAudioDevSel, self).closeEvent(evnt)
+
+    def refreshDevList(self):
+        self.listIPDev()
+        self.listOPDev()
+         
+    def accept(self):
+        try:
+            tempIndex= (self.comboBox_audio_in.currentText()).split(".")
+            global INPUT_DEVICE_IND
+            INPUT_DEVICE_IND=int(tempIndex[0])
+            tempIndex= (self.comboBox_audio_out.currentText()).split(".")
+            global OUTPUT_DEVICE_IND
+            OUTPUT_DEVICE_IND=int(tempIndex[0])
+            print(f"INPUT_DEVICE_IND: {INPUT_DEVICE_IND}\nOUTPUT_DEVICE_IND: {OUTPUT_DEVICE_IND}")
+        except:
+            pass
+        super(Ui_DialogAudioDevSel, self).accept()
+        
+    def reject(self):
+        print("Nope")
+        super(Ui_DialogAudioDevSel, self).reject()
+
+    def listIPDev(self):
+        Ipdvc=[]
+        try:
+          p=pyaudio.PyAudio()
+        except:
+            pass
+        self.comboBox_audio_in.clear()
+        for i in range(p.get_device_count()):
+            if p.get_device_count()!=0:
+                if p.get_device_info_by_index(i).get('maxInputChannels')>0 and '@' not in p.get_device_info_by_index(i).get('name') and int(p.get_device_info_by_index(i).get('hostApi'))==0 and p.get_device_info_by_index(i).get('name')!="Microsoft Sound Mapper - Input":
+                    Ipdvc.append(f"{str(p.get_device_info_by_index(i).get('index'))}. {str(p.get_device_info_by_index(i).get('name'))}...")
+            
+        if len(Ipdvc)==0:
+             Ipdvc.append("No I/P Devices found")
+        p.terminate()
+        self.comboBox_audio_in.insertItems(0,Ipdvc)
+        tempIndex= (self.comboBox_audio_in.currentText()).split(".")
+        global INPUT_DEVICE_IND
+        INPUT_DEVICE_IND=int(tempIndex[0])
+        try:
+           self.comboBox_audio_in.setCurrentIndex(IpDevCurrentInd)
+        except Exception as e:
+            print(e)
+            pass
+
+
+    def listOPDev(self):
+        Opdvc=[]
+        try:
+         p=pyaudio.PyAudio()
+        except Exception as e:
+            print(e)
+            pass
+        self.comboBox_audio_out.clear()
+        for i in range(p.get_device_count()):
+            if p.get_device_info_by_index(i).get('maxOutputChannels')>=2 and '@' not in p.get_device_info_by_index(i).get('name') and int(p.get_device_info_by_index(i).get('hostApi'))==0 and p.get_device_info_by_index(i).get('name')!="Microsoft Sound Mapper - Output":
+                Opdvc.append(f"{str(p.get_device_info_by_index(i).get('index'))}. {str(p.get_device_info_by_index(i).get('name'))}...")
+           
+        if len(Opdvc)==0:
+             Opdvc.append("No O/P Devices found")
+        p.terminate()
+        self.comboBox_audio_out.insertItems(0,Opdvc)
+        tempIndex= (self.comboBox_audio_out.currentText()).split(".")
+        global OUTPUT_DEVICE_IND
+        OUTPUT_DEVICE_IND=int(tempIndex[0])
+        try:
+            self.comboBox_audio_out.setCurrentIndex(OpDevCurrentInd)
+        except:
+            pass
+
+
+    def ipSel(self,i):
+        try:
+            tempIndex= (self.comboBox_audio_in.currentText()).split(".")
+            global INPUT_DEVICE_IND
+            INPUT_DEVICE_IND=int(tempIndex[0])
+            print(f"IP Dev Index: {INPUT_DEVICE_IND}")
+            global IpDevCurrentInd
+            IpDevCurrentInd=i
+        except:
+            pass
+
+
+    def opSel(self,i):
+        try:
+            tempIndex= (self.comboBox_audio_out.currentText()).split(".")
+            global OUTPUT_DEVICE_IND
+            OUTPUT_DEVICE_IND=int(tempIndex[0])
+            print(f"OP Dev Index: {OUTPUT_DEVICE_IND}")
+            global OpDevCurrentInd
+            OpDevCurrentInd=i
+        except:
+            pass
+        
 
 class Ui_DialogRecAudio(QtWidgets.QDialog):
     def __init__(self,parent=None):
@@ -427,7 +640,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("DialogRecAudio")
         Dialog.resize(331, 380)
-        Dialog.setWindowIcon(QtGui.QIcon('mic.png'))
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Dialog.setFixedSize(Dialog.size())
         self.updateThresholdBtn = QtWidgets.QPushButton(Dialog)
@@ -507,7 +720,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
     
     def recordBtnClicked(self):
         testname=self.TestName.text()
-        self.newThread = External2(testname)
+        self.newThread = SpeechWorker(testname)
         self.newThread.signal.connect(self.updateThreshUI)
         self.recordAudioBtn.setEnabled(False)
         self.TestName.setEnabled(False)
@@ -534,7 +747,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(658, 580)
-        MainWindow.setWindowIcon(QtGui.QIcon('logo.ico'))
+        MainWindow.setWindowIcon(QtGui.QIcon('appRes/logo.ico'))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.line = QtWidgets.QFrame(self.centralwidget)
@@ -796,12 +1009,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
+        font.setItalic(True)
         self.ProjName.setFont(font)
         self.ProjName.setFrameShape(QtWidgets.QFrame.Box)
         self.ProjName.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ProjName.setLineWidth(1)
         self.ProjName.setText("")
-        self.ProjName.setAlignment(QtCore.Qt.AlignLeft)
+        self.ProjName.setAlignment(QtCore.Qt.AlignCenter)
+        # self.ProjName.setAlignment(QtCore.Qt.AlignLeft)
         self.ProjName.setWordWrap(True)
         self.ProjName.setObjectName("ProjName")
         self.WacExtStatus = QtWidgets.QLabel(self.centralwidget)
@@ -875,6 +1090,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionExit.triggered.connect(self.close_application)
         self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.actionAbout.triggered.connect(self.dialogAbout)
+        self.actionAudio_Device_selection.triggered.connect(self.onClickedAudioDevSelBtn)
 
         self.retranslateUi(MainWindow)
 
@@ -888,9 +1104,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.WacExtStatus.setText("Extractor Stopped")
         MainWindow.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinimizeButtonHint | QtCore.Qt.WindowTitleHint)
         MainWindow.setFixedSize(MainWindow.size())
+        MainWindow.setWindowState(QtCore.Qt.WindowActive)
+        MainWindow.activateWindow()
     
     def recordSP(self):
-     Ui_DialogRecAudio().exec_()
+        Ui_DialogRecAudio().exec_()
+
+
+    def onClickedAudioDevSelBtn(self):
+        Ui_DialogAudioDevSel().exec_()
      
 
     def dialogAbout(self):
@@ -992,12 +1214,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             
             # temp=str(fileName).split('/')
             # tempFn=str(temp[len(temp)-1])
+            font = QtGui.QFont()
+            font.setFamily("Consolas")
+            font.setPointSize(10)
+            font.setItalic(False)
+            self.ProjName.setFont(font)
+            self.ProjName.setAlignment(QtCore.Qt.AlignLeft)
             self.ProjName.setText("Name: "+tempFn[0:-6]+"\n"+"Date: "+str(datetime.datetime.now().strftime("%c"))+"\n"+"ID: "+str(datetime.datetime.now().strftime("%f")))
             global pFlag
             pFlag=True
-            if cFlagMG==True:
+            if cFlagMG and (self.radioControl.isChecked()==True or self.radioParkinson.isChecked()==True):
               self.recordMG.setEnabled(True)
-            if cFlagSpeech==True:
+            if cFlagSpeech==True and (self.radioControl2.isChecked()==True or self.radioParkinson2.isChecked()==True):
                 self.recordSpeech.setEnabled(True)
     
 
@@ -1014,13 +1242,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
           temp1=str(data).split('#')
           temp=str(temp1[0]).split('/')
           tempFn=str(temp[len(temp)-1])
+          font = QtGui.QFont()
+          font.setFamily("Consolas")
+          font.setPointSize(10)
+          font.setItalic(False)
+          self.ProjName.setFont(font)
+          self.ProjName.setAlignment(QtCore.Qt.AlignLeft)
           self.ProjName.setText("Name: "+tempFn[0:-6]+"\n"+"Date: "+temp1[1]+"\n"+"ID: "+temp1[2])
           global pFlag
           pFlag=True
-          if cFlagMG==True:
+          if cFlagMG and (self.radioControl.isChecked()==True or self.radioParkinson.isChecked()==True):
               self.recordMG.setEnabled(True)
-          if cFlagSpeech==True:
-                self.recordSpeech.setEnabled(True)
+          if cFlagSpeech==True and (self.radioControl2.isChecked()==True or self.radioParkinson2.isChecked()==True):
+              self.recordSpeech.setEnabled(True)
 
 
     def retranslateUi(self, MainWindow):
@@ -1036,6 +1270,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_8.setText(_translate("MainWindow", "Micrographia"))
         self.radioControl.setText(_translate("MainWindow", "Control"))
         self.radioParkinson.setText(_translate("MainWindow", "Parkinson\'s"))
+        self.ProjName.setText(_translate("MainWindow", "No projects opened."))
         self.recordMG.setText(_translate("MainWindow", "Record"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuPreferences.setTitle(_translate("MainWindow", "Preferences"))
@@ -1060,7 +1295,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.recordMG.setEnabled(False)
             self.actionNew_Project.setEnabled(False)
             self.actionOpen_Project.setEnabled(False)
-            self.newThread = External()
+            self.newThread = MGWorker()
             self.newThread.signal.connect(self.finished)
             self.newThread.start()           
              
@@ -1102,7 +1337,7 @@ class PWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    pixmap = QtGui.QPixmap("splash.jpg")
+    pixmap = QtGui.QPixmap("appRes/splash.jpg")
     splash = QtWidgets.QSplashScreen(pixmap,QtCore.Qt.WindowStaysOnTopHint)
     splash.show()
     splash.showMessage("<h3><font color='white'>Intialiasing...</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
@@ -1149,7 +1384,8 @@ if __name__ == "__main__":
     FORMAT = pyaudio.paInt16 # 16 bit res
     RATE = 48000
     THRESHOLD = 3200
-    INPUT_DEVICE_IN=1
+    INPUT_DEVICE_IND=1
+    OUTPUT_DEVICE_IND=1
 
     # MainWindow = QtWidgets.QMainWindow()
     MainWindow=PWindow()
