@@ -3,13 +3,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib import pyplot as plt
 
 path=""
+pathAudInstruction=""
 selMG=""
 selSpeech=""
+audioListFile=[]
 pFlag=False
 cFlagMG=False
 cFlagSpeech=False
 recordMGFlag=False
 recordRunning=False
+instructionPlaying=False
 IpDevCurrentInd=0
 OpDevCurrentInd=0
 
@@ -81,10 +84,14 @@ class SpeechWorker(QtCore.QThread):
         def record(self):
             try:
                 stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, output=True, frames_per_buffer=CHUNK_SIZE, input_device_index=INPUT_DEVICE_IND)
-            except Exception as e:
-                print(str(e)+"\nPress any key to exit")
-                getch()
-                exit()
+            except:
+                try:
+                    stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, output=True, frames_per_buffer=CHUNK_SIZE)
+                except Exception as e:
+                    print(str(e))
+                    consent = QtWidgets.QMessageBox.warning(self,"Warning","An Error occured! Please ensure resources are not being used by other applications.",QtWidgets.QMessageBox.Ok)
+                    if consent==QtWidgets.QMessageBox.Ok:
+                        sys.exit()
             
             num_silent = 0
             snd_started = False
@@ -339,11 +346,22 @@ class SpeechWorker(QtCore.QThread):
 class MGWorker(QtCore.QThread):
     signal = QtCore.pyqtSignal('PyQt_PyObject')
 
-    def __init__(self):
+    def __init__(self,Tname):
+        self.Tname=Tname
         QtCore.QThread.__init__(self)
 
-    def run(self):    
-        pathMgData = path+"\\MG_Data\\"+selMG+"\\"
+    def run(self): 
+
+        if self.Tname=="Arch.Guided Spiral":
+            appendAtLast="Arch_Guided_Spiral"
+        elif self.Tname=="Repeat Letters":
+            appendAtLast="Repeat_Letters"
+        elif self.Tname=="Copy Sentence":
+            appendAtLast="Copy_Sentence"
+        elif self.Tname=="Switching Letters":
+            appendAtLast="Switching_Letters"
+
+        pathMgData = path+"\\MG_Data\\"+selMG+"\\"+appendAtLast+"\\"
         print(f"Micrographia path: {pathMgData}")
         if not os.path.exists(pathMgData):
             os.makedirs(pathMgData)
@@ -396,15 +414,19 @@ class MGWorker(QtCore.QThread):
 class playTestSoundWorker(QtCore.QThread):
     signal = QtCore.pyqtSignal('PyQt_PyObject')
 
-    def __init__(self):
+    def __init__(self,Fname):
+        self.Fname=Fname
         QtCore.QThread.__init__(self)
 
     def run(self):    
-        filename = 'appRes/tone.wav'
-        chunk = 256  
+        filename =self.Fname
+        chunk = 1024  
         wf = wave.open(filename, 'rb')
         p = pyaudio.PyAudio()
-        stream = p.open(format = p.get_format_from_width(wf.getsampwidth()), channels = wf.getnchannels(), rate = wf.getframerate(),output_device_index=OUTPUT_DEVICE_IND, output = True)
+        try:
+            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()), channels = wf.getnchannels(), rate = wf.getframerate(),output_device_index=OUTPUT_DEVICE_IND, output = True)
+        except:
+            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()), channels = wf.getnchannels(), rate = wf.getframerate(), output = True)
         data = wf.readframes(chunk)
         try:
             while data != b'':
@@ -420,8 +442,229 @@ class playTestSoundWorker(QtCore.QThread):
         self.signal.emit("Stopped")
     
     def stop(self):
+        print("Wav player terminated.")
         self.terminate()
 
+
+class Ui_DialogPreRecordedInst(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        QtWidgets.QDialog.__init__(self,parent)
+        self.setupUi(self)
+    
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(507, 399)
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        Dialog.setFixedSize(Dialog.size())
+        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
+        self.buttonBox.setGeometry(QtCore.QRect(130, 350, 341, 32))
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName("buttonBox")
+        self.audioList = QtWidgets.QListWidget(Dialog)
+        self.audioList.setGeometry(QtCore.QRect(20, 20, 471, 251))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.audioList.setFont(font)
+        self.audioList.setObjectName("audioList")
+
+        try:
+            global audioListFile
+            with open('appRes/store.dat', 'rb') as f:
+                audioListFile = pickle.load(f)
+                self.audioList.addItems(audioListFile)
+        except:
+            print("Initialize store.dat")
+            pass
+
+        self.addItems = QtWidgets.QPushButton(Dialog)
+        self.addItems.setGeometry(QtCore.QRect(20, 290, 91, 23))
+        self.addItems.setObjectName("addItems")
+        self.deleteItems = QtWidgets.QPushButton(Dialog)
+        self.deleteItems.setGeometry(QtCore.QRect(140, 290, 91, 23))
+        self.deleteItems.setObjectName("deleteItems")
+
+        self.retranslateUi(Dialog)
+        self.buttonBox.accepted.connect(Dialog.accept)
+        self.buttonBox.rejected.connect(Dialog.reject)
+        self.addItems.clicked.connect(self.onClickedAddItemsBtn)
+        self.deleteItems.clicked.connect(self.onClickedDeleteItemsBtn)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Pre Recorded Instructions"))
+        self.addItems.setText(_translate("Dialog", "Add Item.."))
+        self.deleteItems.setText(_translate("Dialog", "Delete Item.."))
+
+    def onClickedAddItemsBtn(self):
+        global audioListFile
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Add Audio", "", "WAV Audio Files (*.wav);;All Files (*)") 
+        if fileName:
+            global pathAudInstruction
+            temp=str(fileName).split('/')
+            tempFn=temp[len(temp)-1]
+            if self.audioList.findItems(tempFn,QtCore.Qt.MatchContains):
+                tempRow=self.audioList.row((self.audioList.findItems(tempFn,QtCore.Qt.MatchContains))[0])
+                consent = QtWidgets.QMessageBox.question(self,"Confirmation","Item already exists. Replace?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                if consent == QtWidgets.QMessageBox.Yes:
+                    try:
+                        self.audioList.takeItem(tempRow)
+                        print("Item Deleted")
+                        pathAudInstruction=os.path.dirname(fileName)
+                        print(pathAudInstruction)
+                        print(tempFn)
+                        shutil.copy(fileName,'appRes/')
+                        self.audioList.addItem(tempFn)
+                        print("Item Replaced")
+                    except Exception as e:
+                        consent = QtWidgets.QMessageBox.warning(self,"Warning","An Error occured! Please ensure resources are not being used by other applications.",QtWidgets.QMessageBox.Ok)
+                        print(e)
+                        pass
+            else:
+                try:
+                    pathAudInstruction=os.path.dirname(fileName)
+                    print(pathAudInstruction)
+                    print(tempFn)
+                    shutil.copy(fileName,'appRes/')
+                    self.audioList.addItem(tempFn)
+                    audioListFile.append(tempFn)
+                    with open('appRes/store.dat', 'wb') as f:
+                        pickle.dump(audioListFile, f)
+                    print("Added to list")
+                except Exception as e:
+                    consent = QtWidgets.QMessageBox.warning(self,"Warning","An Error occured! Please ensure resources are not being used by other applications.",QtWidgets.QMessageBox.Ok)
+                    print(e)
+                    pass
+    
+    def onClickedDeleteItemsBtn(self):
+        if self.audioList.currentItem():
+            currentText=str(self.audioList.currentItem().text())
+            consent = QtWidgets.QMessageBox.question(self,"Confirmation",f"Delete Item \"{currentText}\"?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if consent == QtWidgets.QMessageBox.Yes:
+                self.audioList.takeItem(self.audioList.currentRow())
+                try:
+                    global audioListFile
+                    audioListFile.remove(currentText)
+                    with open('appRes/store.dat', 'wb') as f:
+                        pickle.dump(audioListFile, f)
+                    if os.path.exists(f"appRes/{currentText}"):
+                         os.remove(f"appRes/{currentText}")
+                    print("Removed from list")
+                except Exception as e:
+                    print(f"Value error: {e}")
+                    consent = QtWidgets.QMessageBox.warning(self,"Warning","An Error occured! Please ensure resources are not being used by other applications.",QtWidgets.QMessageBox.Ok)
+                    pass     
+        else:
+            consent = QtWidgets.QMessageBox.information(self,"Information","Nothing selected!",QtWidgets.QMessageBox.Ok)
+    
+
+class Ui_DialogPlayInstruction(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        QtWidgets.QDialog.__init__(self,parent)
+        self.setupUi(self)
+
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(400, 150)
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/ins.ico'))
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        Dialog.setFixedSize(Dialog.size())
+        self.label_choose = QtWidgets.QLabel(Dialog)
+        self.label_choose.setGeometry(QtCore.QRect(20, 20, 141, 21))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_choose.setFont(font)
+        self.label_choose.setObjectName("label_choose")
+        self.chooseInstCombo = QtWidgets.QComboBox(Dialog)
+        self.chooseInstCombo.setGeometry(QtCore.QRect(20, 60, 301, 22))
+        self.chooseInstCombo.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.chooseInstCombo.setFont(font)
+        self.chooseInstCombo.setObjectName("chooseInstCombo")
+        self.playInstBtn = QtWidgets.QPushButton(Dialog)
+        self.playInstBtn.setGeometry(QtCore.QRect(340, 52, 31, 31))
+        self.playInstBtn.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("appRes/Play.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.playInstBtn.setIcon(icon)
+        self.playInstBtn.setObjectName("playInstBtn")
+        self.playInstBtn.clicked.connect(self.onClickedplayInstBtn)
+        self.continueToRecordBtn = QtWidgets.QPushButton(Dialog)
+        self.continueToRecordBtn.setGeometry(QtCore.QRect(274, 110, 81, 23))
+        self.continueToRecordBtn.setObjectName("continueToRecordBtn")
+        self.continueToRecordBtn.clicked.connect(self.onClickedContinueToRecordBtn)
+        self.retranslateUi(Dialog)
+
+        if len(audioListFile)==0:
+            self.chooseInstCombo.addItem("No Instructions Found")
+            self.playInstBtn.setEnabled(False)
+        else:
+            self.chooseInstCombo.addItems(audioListFile)
+
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Pre Recorded Instructions Player"))
+        self.label_choose.setText(_translate("Dialog", "Choose Instruction:"))
+        self.continueToRecordBtn.setText(_translate("Dialog", "Continue"))
+
+    def onClickedplayInstBtn(self):
+        global instructionPlaying
+        if not instructionPlaying:           
+            instructionPlaying=True
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap("appRes/Stop.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.playInstBtn.setIcon(icon)
+            self.newThread = playTestSoundWorker(f'appRes/{self.chooseInstCombo.currentText()}')
+            self.newThread.signal.connect(self.instructionPlayerSignals)
+            self.newThread.start()
+        else:
+            self.newThread.stop()
+            instructionPlaying=False
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap("appRes/Play.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.playInstBtn.setIcon(icon)
+
+
+    def instructionPlayerSignals(self):
+        global instructionPlaying
+        print("Stopped")
+        instructionPlaying=False
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("appRes/Play.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.playInstBtn.setIcon(icon)
+
+    def closeEvent(self,evnt):
+        global instructionPlaying 
+        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to stop playing instruction?\nControl will pass to recorder.",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if close == QtWidgets.QMessageBox.Yes:
+            super(Ui_DialogPlayInstruction, self).closeEvent(evnt)
+            if instructionPlaying:
+                instructionPlaying=False
+                self.newThread.stop()
+        else:
+            evnt.ignore()
+
+    def onClickedContinueToRecordBtn(self):
+        global instructionPlaying 
+        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to continue?\nControl will pass to recorder.",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if close == QtWidgets.QMessageBox.Yes:
+             if instructionPlaying:
+                self.newThread.stop()
+                instructionPlaying=False
+             self.done(0)
 
 class Ui_DialogAbout(QtWidgets.QDialog):
     def __init__(self,parent=None):
@@ -523,7 +766,7 @@ class Ui_DialogAudioDevSel(QtWidgets.QDialog):
         self.label_audio_out.setText(_translate("Dialog", "Audio Out:"))
 
     def testDevSound(self):
-        self.newThread = playTestSoundWorker()
+        self.newThread = playTestSoundWorker('appRes/tone.wav')
         self.newThread.signal.connect(self.testSoundPlayStopped)
         self.newThread.start()
 
@@ -719,6 +962,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
             self.recordAudioBtn.setEnabled(True)
     
     def recordBtnClicked(self):
+        Ui_DialogPlayInstruction().exec_()
         testname=self.TestName.text()
         self.newThread = SpeechWorker(testname)
         self.newThread.signal.connect(self.updateThreshUI)
@@ -1042,6 +1286,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioParkinson2.setGeometry(QtCore.QRect(90, 440, 82, 17))
         self.radioParkinson2.setObjectName("radioParkinson2")
         self.radioParkinson2.toggled.connect(lambda:self.btnstate2(self.radioParkinson2))
+        self.TestNameCombo = QtWidgets.QComboBox(self.centralwidget)
+        self.TestNameCombo.setGeometry(QtCore.QRect(115, 280, 122, 23))
+        self.TestNameCombo.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(8)
+        self.TestNameCombo.setFont(font)
+        self.TestNameCombo.setObjectName("TestNameCombo")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 658, 21))
@@ -1091,13 +1343,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.actionAbout.triggered.connect(self.dialogAbout)
         self.actionAudio_Device_selection.triggered.connect(self.onClickedAudioDevSelBtn)
+        self.actionPre_recorded_Instructions.triggered.connect(self.onClickedPreRecordedInstructions)
 
         self.retranslateUi(MainWindow)
+        try:
+            global audioListFile
+            with open('appRes/store.dat', 'rb') as f:
+                    audioListFile = pickle.load(f)
+        except:
+            pass
 
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         app.aboutToQuit.connect(self.exit_message)
         self.recordMG.clicked.connect(self.recordMGData)
         self.recordSpeech.setEnabled(False)
+        self.TestNameCombo.insertItems(0,['Arch.Guided Spiral','Repeat Letters','Copy Sentence','Switching Letters'])
         self.recordSpeech.clicked.connect(self.recordSP)
         self.radioControl2.toggled.connect(self.onClickedControl2)
         self.radioParkinson2.toggled.connect(self.onClickedParkinson2)
@@ -1106,14 +1366,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         MainWindow.setFixedSize(MainWindow.size())
         MainWindow.setWindowState(QtCore.Qt.WindowActive)
         MainWindow.activateWindow()
-    
+        
     def recordSP(self):
         Ui_DialogRecAudio().exec_()
-
 
     def onClickedAudioDevSelBtn(self):
         Ui_DialogAudioDevSel().exec_()
      
+    def onClickedPreRecordedInstructions(self):
+        Ui_DialogPreRecordedInst().exec_()
 
     def dialogAbout(self):
      Ui_DialogAbout().exec_()
@@ -1137,8 +1398,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def close_application(self):
         close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to exit?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if close == QtWidgets.QMessageBox.Yes:
-            sys.exit()
-    
+            close2 = QtWidgets.QMessageBox.information(self,"Info","Data saved to project folder.\nFor folder structure refer documentation.", QtWidgets.QMessageBox.Ok)
+            if close2 == QtWidgets.QMessageBox.Ok:
+                sys.exit()
     def exit_message(self):
         close = QtWidgets.QMessageBox.information(self,"Info","Data saved to project folder.\nFor folder structure refer documentation.", QtWidgets.QMessageBox.Ok)
         if close == QtWidgets.QMessageBox.Ok:
@@ -1273,6 +1535,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.ProjName.setText(_translate("MainWindow", "No projects opened."))
         self.recordMG.setText(_translate("MainWindow", "Record"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.TestNameCombo.setToolTip(_translate("MainWindow", "Select Type"))
         self.menuPreferences.setTitle(_translate("MainWindow", "Preferences"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
@@ -1289,15 +1552,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
     def recordMGData(self):
-            global recordMGFlag
-            recordMGFlag=True
-            self.WacExtStatus.setText("Extractor Running")
-            self.recordMG.setEnabled(False)
-            self.actionNew_Project.setEnabled(False)
-            self.actionOpen_Project.setEnabled(False)
-            self.newThread = MGWorker()
-            self.newThread.signal.connect(self.finished)
-            self.newThread.start()           
+            consent = QtWidgets.QMessageBox.question(self,"Confirmation","You will not be able to cancel later on!\nAre you sure to continue?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if consent==QtWidgets.QMessageBox.Yes:
+                Ui_DialogPlayInstruction().exec_()
+                global recordMGFlag
+                recordMGFlag=True
+                self.WacExtStatus.setText("Extractor Running")
+                self.recordMG.setEnabled(False)
+                self.actionNew_Project.setEnabled(False)
+                self.actionOpen_Project.setEnabled(False)
+                testname=self.TestNameCombo.currentText()
+                self.newThread = MGWorker(testname)
+                print(f'MG TestName: {testname}')
+                self.newThread.signal.connect(self.finished)
+                self.newThread.start() 
+            else:
+                consent = QtWidgets.QMessageBox.information(self,"Information","Record Cancelled.",QtWidgets.QMessageBox.Ok)            
              
                 
     def finished(self, result):
@@ -1347,6 +1617,7 @@ if __name__ == "__main__":
         from msvcrt import getch
         import datetime
         import time
+        import pickle
         from time import sleep
         import wmi
         splash.showMessage("<h3><font color='white'>Loading module wmi..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
@@ -1368,6 +1639,7 @@ if __name__ == "__main__":
         import datetime
         import subprocess
         import os
+        import shutil
         from sys import byteorder
         from array import array
         from struct import pack
@@ -1394,4 +1666,6 @@ if __name__ == "__main__":
     splash.showMessage("<h3><font color='white'>Done.</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
     MainWindow.show()
     splash.finish(MainWindow)
+    if len(audioListFile)==0:
+        QtWidgets.QMessageBox.information(MainWindow,"Information","PDFE detected no \"Pre-recorded Instructions\".\nTo record one, go to Menu-bar-->Preferences-->Pre-recorded Instructions",QtWidgets.QMessageBox.Ok)
     sys.exit(app.exec_())

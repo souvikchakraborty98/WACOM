@@ -805,6 +805,25 @@
      <string>Parkinson's</string>
     </property>
    </widget>
+   <widget class="QComboBox" name="TestNameCombo">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>280</y>
+      <width>122</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>6</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select Type</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
