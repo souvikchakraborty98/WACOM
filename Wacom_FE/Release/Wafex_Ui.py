@@ -3,18 +3,30 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib import pyplot as plt
 
 path=""
+
 pathAudInstruction=""
 selMG=""
 selSpeech=""
 audioListFile=[]
+
 pFlag=False
 cFlagMG=False
 cFlagSpeech=False
 recordMGFlag=False
 recordRunning=False
 instructionPlaying=False
+
 IpDevCurrentInd=0
 OpDevCurrentInd=0
+
+sprecNamesCG=[]
+sptestNamesCG=[]
+sprecNamesPD=[]
+sptestNamesPD=[]
+mgtesttypesCG=[]
+mgtestNamesCG=[]
+mgtesttypesPD=[]
+mgtestNamesPD=[]
 
 
 class SpeechWorker(QtCore.QThread):
@@ -312,7 +324,8 @@ class SpeechWorker(QtCore.QThread):
         subprocess.Popen(["notepad.exe", formantmatrixSave])
         subprocess.Popen(["notepad.exe", mfccdata])
         subprocess.Popen(["notepad.exe", ops])
-       
+
+        plt.figure(num=self.Tname) 
         plt.subplot(1,2,1)
         plt.title('Speech Signal Representation')
         plt.plot(snd.xs(), snd.values.T)
@@ -332,6 +345,7 @@ class SpeechWorker(QtCore.QThread):
 
         mng=plt.get_current_fig_manager()
         mng.window.state("zoomed")
+        plt.draw()
         plt.show()
         f.close()
         self.signal.emit("#end")
@@ -602,8 +616,20 @@ class Ui_DialogPlayInstruction(QtWidgets.QDialog):
         self.playInstBtn.clicked.connect(self.onClickedplayInstBtn)
         self.continueToRecordBtn = QtWidgets.QPushButton(Dialog)
         self.continueToRecordBtn.setGeometry(QtCore.QRect(274, 110, 81, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.continueToRecordBtn.setFont(font)
         self.continueToRecordBtn.setObjectName("continueToRecordBtn")
+        self.cancelRecord = QtWidgets.QPushButton(Dialog)
+        self.cancelRecord.setGeometry(QtCore.QRect(10, 110, 104, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        self.cancelRecord.setFont(font)
+        self.cancelRecord.setObjectName("cancelRecord")
         self.continueToRecordBtn.clicked.connect(self.onClickedContinueToRecordBtn)
+        self.cancelRecord.clicked.connect(self.onClickedCancelRecordBtn)
         self.retranslateUi(Dialog)
 
         if len(audioListFile)==0:
@@ -619,6 +645,7 @@ class Ui_DialogPlayInstruction(QtWidgets.QDialog):
         Dialog.setWindowTitle(_translate("Dialog", "Pre Recorded Instructions Player"))
         self.label_choose.setText(_translate("Dialog", "Choose Instruction:"))
         self.continueToRecordBtn.setText(_translate("Dialog", "Continue"))
+        self.cancelRecord.setText(_translate("Dialog", "Terminate Record"))
 
     def onClickedplayInstBtn(self):
         global instructionPlaying
@@ -647,7 +674,7 @@ class Ui_DialogPlayInstruction(QtWidgets.QDialog):
         self.playInstBtn.setIcon(icon)
 
     def closeEvent(self,evnt):
-        global instructionPlaying 
+        global instructionPlaying
         close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to stop playing instruction?\nControl will pass to recorder.",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if close == QtWidgets.QMessageBox.Yes:
             super(Ui_DialogPlayInstruction, self).closeEvent(evnt)
@@ -665,6 +692,16 @@ class Ui_DialogPlayInstruction(QtWidgets.QDialog):
                 self.newThread.stop()
                 instructionPlaying=False
              self.done(0)
+
+    def onClickedCancelRecordBtn(self):
+        global instructionPlaying 
+        close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to force terminate?\nControl will NOT pass to recorder.",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if close == QtWidgets.QMessageBox.Yes:
+             if instructionPlaying:
+                self.newThread.stop()
+                instructionPlaying=False
+             self.done(2)
+    
 
 class Ui_DialogAbout(QtWidgets.QDialog):
     def __init__(self,parent=None):
@@ -962,14 +999,14 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
             self.recordAudioBtn.setEnabled(True)
     
     def recordBtnClicked(self):
-        Ui_DialogPlayInstruction().exec_()
-        testname=self.TestName.text()
-        self.newThread = SpeechWorker(testname)
-        self.newThread.signal.connect(self.updateThreshUI)
-        self.recordAudioBtn.setEnabled(False)
-        self.TestName.setEnabled(False)
-        self.recordAudioBtn.setText("Listening..")
-        self.newThread.start()
+        if Ui_DialogPlayInstruction().exec_()!=2:
+            testname=self.TestName.text()
+            self.newThread = SpeechWorker(testname)
+            self.newThread.signal.connect(self.updateThreshUI)
+            self.recordAudioBtn.setEnabled(False)
+            self.TestName.setEnabled(False)
+            self.recordAudioBtn.setText("Listening..")
+            self.newThread.start()
 
             
     def updateThreshUI(self, result):
@@ -983,6 +1020,640 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
             self.TestName.setEnabled(True)
 
 
+class Ui_DialogMgRepViewer(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        QtWidgets.QDialog.__init__(self,parent)
+        self.setupUi(self)
+
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(708, 566)
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/logo.ico'))
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        Dialog.setFixedSize(Dialog.size())
+        self.MgCgTnList = QtWidgets.QListWidget(Dialog)
+        self.MgCgTnList.setGeometry(QtCore.QRect(358, 313, 331, 211))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.MgCgTnList.setFont(font)
+        self.MgCgTnList.setObjectName("MgCgTnList")
+        self.mgviewResPD = QtWidgets.QPushButton(Dialog)
+        self.mgviewResPD.setGeometry(QtCore.QRect(500, 251, 90, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.mgviewResPD.setFont(font)
+        self.mgviewResPD.setObjectName("mgviewResPD")
+        self.label_MgPdTn = QtWidgets.QLabel(Dialog)
+        self.label_MgPdTn.setGeometry(QtCore.QRect(358, 14, 231, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_MgPdTn.setFont(font)
+        self.label_MgPdTn.setObjectName("label_MgPdTn")
+        self.label_MgCgTn = QtWidgets.QLabel(Dialog)
+        self.label_MgCgTn.setGeometry(QtCore.QRect(358, 291, 231, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_MgCgTn.setFont(font)
+        self.label_MgCgTn.setObjectName("label_MgCgTn")
+        self.mgviewResCG = QtWidgets.QPushButton(Dialog)
+        self.mgviewResCG.setGeometry(QtCore.QRect(500, 530, 90, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.mgviewResCG.setFont(font)
+        self.mgviewResCG.setObjectName("mgviewResCG")
+        self.MgPdTnList = QtWidgets.QListWidget(Dialog)
+        self.MgPdTnList.setGeometry(QtCore.QRect(358, 33, 331, 211))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.MgPdTnList.setFont(font)
+        self.MgPdTnList.setObjectName("MgPdTnList")
+        self.MgPdRecTypeList = QtWidgets.QListWidget(Dialog)
+        self.MgPdRecTypeList.setGeometry(QtCore.QRect(20, 33, 251, 211))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.MgPdRecTypeList.setFont(font)
+        self.MgPdRecTypeList.setObjectName("MgPdRecTypeList")
+        self.MgCgRecTypeList = QtWidgets.QListWidget(Dialog)
+        self.MgCgRecTypeList.setGeometry(QtCore.QRect(20, 313, 251, 211))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.MgCgRecTypeList.setFont(font)
+        self.MgCgRecTypeList.setObjectName("MgCgRecTypeList")
+        self.viewMgPdTnBtn = QtWidgets.QPushButton(Dialog)
+        self.viewMgPdTnBtn.setGeometry(QtCore.QRect(282, 117, 65, 51))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.viewMgPdTnBtn.setFont(font)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("appRes/right.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.viewMgPdTnBtn.setIcon(icon)
+        self.viewMgPdTnBtn.setObjectName("viewMgPdTnBtn")
+        self.viewMgCgTnBtn = QtWidgets.QPushButton(Dialog)
+        self.viewMgCgTnBtn.setGeometry(QtCore.QRect(282, 397, 65, 51))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.viewMgCgTnBtn.setFont(font)
+        self.viewMgCgTnBtn.setIcon(icon)
+        self.viewMgCgTnBtn.setObjectName("viewMgCgTnBtn")
+        self.label_MgPdTt = QtWidgets.QLabel(Dialog)
+        self.label_MgPdTt.setGeometry(QtCore.QRect(20, 13, 241, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_MgPdTt.setFont(font)
+        self.label_MgPdTt.setObjectName("label_MgPdTt")
+        self.label_MgCgTt = QtWidgets.QLabel(Dialog)
+        self.label_MgCgTt.setGeometry(QtCore.QRect(20, 290, 231, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_MgCgTt.setFont(font)
+        self.label_MgCgTt.setObjectName("label_MgCgTt")
+
+        self.retranslateUi(Dialog)
+        self.MgPdRecTypeList.addItems(mgtesttypesPD)
+        self.MgCgRecTypeList.addItems(mgtesttypesCG)
+        self.viewMgPdTnBtn.clicked.connect(self.onClickedViewMgPdTnBtn)
+        self.viewMgCgTnBtn.clicked.connect(self.onClickedViewMgCgTnBtn)
+        self.mgviewResCG.clicked.connect(self.onClickedViewResCG)
+        self.mgviewResPD.clicked.connect(self.onClickedViewResPD)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "MG Report Viewer"))
+        self.mgviewResPD.setText(_translate("Dialog", "View Result.."))
+        self.label_MgPdTn.setText(_translate("Dialog", "PD Testnames of Selected Record:"))
+        self.label_MgCgTn.setText(_translate("Dialog", "CG Testnames of Selected Record:"))
+        self.mgviewResCG.setText(_translate("Dialog", "View Result.."))
+        self.viewMgPdTnBtn.setText(_translate("Dialog", "View\nTests"))
+        self.viewMgCgTnBtn.setText(_translate("Dialog", "View\nTests"))
+        self.label_MgPdTt.setText(_translate("Dialog", "PD Test-types of Selected Record:"))
+        self.label_MgCgTt.setText(_translate("Dialog", "CG Test-types of Selected Record:"))
+
+    def onClickedViewMgPdTnBtn(self):
+        if self.MgPdRecTypeList.selectedItems():
+            self.MgPdTnList.clear()
+            pathTemp=self.MgPdRecTypeList.currentItem().text()
+            newPathTemp=path+'/MG_Data/PD/'+pathTemp
+            print(f"{newPathTemp} clicked")
+            fpdCount=0
+            for _, _, filenames in os.walk(newPathTemp):
+                if not len(filenames)==0:
+                    print(filenames)
+                    fpdCount+=len(filenames)
+                    for i in filenames:
+                        if i[len(i)-3:len(i)]=='log':
+                            self.MgPdTnList.addItem(i[0:len(i)-4])
+                            print(i[0:len(i)-4])
+            
+            if fpdCount==0:
+                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+        else:
+           QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+
+    def onClickedViewMgCgTnBtn(self):
+        if self.MgCgRecTypeList.selectedItems():
+            self.MgCgTnList.clear()
+            pathTemp=self.MgCgRecTypeList.currentItem().text()
+            newPathTemp=path+'/MG_Data/CG/'+pathTemp
+            print(f"{newPathTemp} clicked")
+            fcgCount=0
+            for _, _, filenames in os.walk(newPathTemp):
+                if not len(filenames)==0:
+                    print(filenames)
+                    fcgCount+=len(filenames)
+                    for i in filenames:
+                        if i[len(i)-3:len(i)]=='log':
+                            self.MgCgTnList.addItem(i[0:len(i)-4])
+                            print(i[0:len(i)-4])
+            if fcgCount==0:
+                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+        else:
+           QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+    def onClickedViewResCG(self):
+        if self.MgCgTnList.selectedItems():
+            searchFileRoot=""
+            newPathTemp=path+'/MG_Data/CG'
+            search=self.MgCgTnList.currentItem().text()
+            searchFn=search+".log"
+            for root, _, filenames in os.walk(newPathTemp):
+                for i in filenames:
+                    if i==searchFn:
+                        searchFileRoot=root
+            print(searchFileRoot)
+            accessError=False
+            notOtherData=True
+            for root, _, filenames in os.walk(searchFileRoot):
+                for i in filenames:
+                    notOtherData=True
+                    fnName=(i.split('.'))[0]
+                    try:
+                        print(f"\n fnName: {fnName[len(fnName)-(len(search)-21):len(fnName)]}\nSearch: {search[21:len(search)]}\n")
+                        if fnName[len(fnName)-(len(search)-21):len(fnName)]==search[21:len(search)]:
+                            notOtherData=False
+                    except:
+                        accessError=True
+                        pass
+                    if notOtherData==False:
+                        try:
+                            if i[len(i)-3:len(i)]=='log':
+                                subprocess.Popen(["notepad.exe", root+"/"+i])
+                            else:
+                                os.startfile(root+"/"+i)
+                        except:
+                            accessError==True
+                            pass
+                    if accessError==True:
+                        QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+    
+            try:
+                coord=searchFileRoot+"/Coordinate Data Time"+search[21:len(search)]+".csv"
+                press=searchFileRoot+"/Pressure Data Time"+search[21:len(search)]+".csv"
+                self.plotViewer(coord,press,search) 
+            except Exception as e:
+                print(f"File Access Error: {e}")
+                QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+        else:
+            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+
+    def onClickedViewResPD(self):
+        if self.MgPdTnList.selectedItems():
+            searchFileRoot=""
+            newPathTemp=path+'/MG_Data/PD'
+            search=self.MgPdTnList.currentItem().text()
+            searchFn=search+".log"
+            for root, _, filenames in os.walk(newPathTemp):
+                for i in filenames:
+                    if i==searchFn:
+                        searchFileRoot=root
+            print(searchFileRoot)
+            accessError=False
+            notOtherData=True
+            for root, _, filenames in os.walk(searchFileRoot):
+                for i in filenames:
+                    notOtherData=True
+                    fnName=(i.split('.'))[0]
+                    try:
+                        print(f"\n fnName: {fnName[len(fnName)-(len(search)-21):len(fnName)]}\nSearch: {search[21:len(search)]}\n")
+                        if fnName[len(fnName)-(len(search)-21):len(fnName)]==search[21:len(search)]:
+                            notOtherData=False
+                    except:
+                        accessError=True
+                        pass
+                    if notOtherData==False:
+                        try:
+                            if i[len(i)-3:len(i)]=='log':
+                                subprocess.Popen(["notepad.exe", root+"/"+i])
+                            else:
+                                os.startfile(root+"/"+i)
+                        except:
+                            accessError==True
+                            pass
+                    if accessError==True:
+                        QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+    
+            try:
+                coord=searchFileRoot+"/Coordinate Data Time"+search[21:len(search)]+".csv"
+                press=searchFileRoot+"/Pressure Data Time"+search[21:len(search)]+".csv"
+                self.plotViewer(coord,press,search) 
+            except Exception as e:
+                print(f"File Access Error: {e}")
+                QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+        else:
+            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+
+    def plotViewer(self,coord,press,name):
+        x=[]
+        y=[]
+        xp=[]
+        with open(coord,'r') as csvfile:
+            plots = csv.reader(csvfile, delimiter=',')
+            for row in plots:
+                x.append(int(row[0]))
+                y.append(int(row[1]))
+
+        with open(press,'r') as csvfile:
+            plots = csv.reader(csvfile, delimiter=',')
+            for row in plots:
+                xp.append(int(row[0]))
+
+        plt.figure(num=name)
+        plt.subplot(2,1,1)
+        plt.plot(x,y,'o',label='Pressure Points')
+        plt.plot(x,y,'-k',label='Tip movement')
+        ax = plt.gca()
+        ax.set_ylim(ax.get_ylim()[::-1])
+        plt.xlabel('x pixels')
+        plt.ylabel('y pixels')
+        plt.title('Coordinate data Scatter plot')
+        plt.tight_layout(pad=0.4)
+        plt.legend()
+
+        plt.subplot(2,1,2)
+        plt.plot(xp, label='xy plot')
+        plt.xlabel('Coordinate plot pressure points (x)')
+        plt.ylabel('Pressure (y)')
+        plt.title('Presssure data 2D plot')
+        plt.legend()
+        plt.tight_layout(pad=0.4)
+
+        mng=plt.get_current_fig_manager()
+        mng.window.state("zoomed")
+        mplcursors.cursor(hover=True)
+
+        plt.draw()
+        plt.show()
+
+class Ui_DialogSpeechRepViewer(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        QtWidgets.QDialog.__init__(self,parent)
+        self.setupUi(self)
+
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(678, 564)
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        Dialog.setFixedSize(Dialog.size())
+        self.SpCgRecList = QtWidgets.QListWidget(Dialog)
+        self.SpCgRecList.setGeometry(QtCore.QRect(20, 310, 281, 211))
+        self.SpCgRecList.setObjectName("SpCgRecList")
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.SpCgRecList.setFont(font)
+        self.viewSpPdTnBtn = QtWidgets.QPushButton(Dialog)
+        self.viewSpPdTnBtn.setGeometry(QtCore.QRect(303, 110, 65, 51))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.viewSpPdTnBtn.setFont(font)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("appRes/right.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.viewSpPdTnBtn.setIcon(icon)
+        self.viewSpPdTnBtn.setObjectName("viewSpPdTnBtn")
+        self.label_SpPdRep = QtWidgets.QLabel(Dialog)
+        self.label_SpPdRep.setGeometry(QtCore.QRect(20, 10, 81, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_SpPdRep.setFont(font)
+        self.label_SpPdRep.setObjectName("label_SpPdRep")
+        self.label_SpCgRep = QtWidgets.QLabel(Dialog)
+        self.label_SpCgRep.setGeometry(QtCore.QRect(20, 290, 81, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_SpCgRep.setFont(font)
+        self.label_SpCgRep.setObjectName("label_SpCgRep")
+        self.viewSpCgTnBtn = QtWidgets.QPushButton(Dialog)
+        self.viewSpCgTnBtn.setGeometry(QtCore.QRect(303, 393, 65, 51))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.viewSpCgTnBtn.setFont(font)
+        self.viewSpCgTnBtn.setIcon(icon)
+        self.viewSpCgTnBtn.setObjectName("viewSpCgTnBtn")
+        self.SpPdRecList = QtWidgets.QListWidget(Dialog)
+        self.SpPdRecList.setGeometry(QtCore.QRect(20, 30, 281, 211))
+        self.SpPdRecList.setObjectName("SpPdRecList")
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.SpPdRecList.setFont(font)
+        self.SpPdTnList = QtWidgets.QListWidget(Dialog)
+        self.SpPdTnList.setGeometry(QtCore.QRect(370, 30, 281, 211))
+        self.SpPdTnList.setObjectName("SpPdTnList")
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.SpPdTnList.setFont(font)
+        self.SpCgTnList = QtWidgets.QListWidget(Dialog)
+        self.SpCgTnList.setGeometry(QtCore.QRect(370, 310, 281, 211))
+        self.SpCgTnList.setObjectName("SpCgTnList")
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.SpCgTnList.setFont(font)
+        self.label_SpPdTn = QtWidgets.QLabel(Dialog)
+        self.label_SpPdTn.setGeometry(QtCore.QRect(370, 10, 500, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_SpPdTn.setFont(font)
+        self.label_SpPdTn.setObjectName("label_SpPdTn")
+        self.label_SpCgTn = QtWidgets.QLabel(Dialog)
+        self.label_SpCgTn.setGeometry(QtCore.QRect(370, 290, 500, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_SpCgTn.setFont(font)
+        self.label_SpCgTn.setObjectName("label_SpCgTn")
+        self.viewResPD = QtWidgets.QPushButton(Dialog)
+        self.viewResPD.setGeometry(QtCore.QRect(562, 250, 90, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.viewResPD.setFont(font)
+        self.viewResPD.setObjectName("viewResPD")
+        self.viewResCG = QtWidgets.QPushButton(Dialog)
+        self.viewResCG.setGeometry(QtCore.QRect(563, 530, 90, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.viewResCG.setFont(font)
+        self.viewResCG.setObjectName("viewResCG")
+
+        self.retranslateUi(Dialog)
+
+        self.SpPdRecList.addItems(sprecNamesPD)
+        self.SpCgRecList.addItems(sprecNamesCG)
+        self.viewSpPdTnBtn.clicked.connect(self.onClickedViewSpPdTnBtn)
+        self.viewSpCgTnBtn.clicked.connect(self.onClickedViewSpCgTnBtn)
+        self.viewResPD.clicked.connect(self.onClickedViewResPD)
+        self.viewResCG.clicked.connect(self.onClickedViewResCG)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Speech Report Viewer"))
+        self.viewSpPdTnBtn.setText(_translate("Dialog", "View\nTests"))
+        self.label_SpPdRep.setText(_translate("Dialog", "PD Records:"))
+        self.label_SpCgRep.setText(_translate("Dialog", "CG Records:"))
+        self.viewSpCgTnBtn.setText(_translate("Dialog", "View\nTests"))
+        self.label_SpPdTn.setText(_translate("Dialog", "PD Testnames of Selected Record:"))
+        self.label_SpCgTn.setText(_translate("Dialog", "CG Testnames of Selected Record:"))
+        self.viewResPD.setText(_translate("Dialog", "View Result.."))
+        self.viewResCG.setText(_translate("Dialog", "View Result.."))
+
+    def onClickedViewSpPdTnBtn(self):
+        if self.SpPdRecList.selectedItems():
+            self.SpPdTnList.clear()
+            pathTemp=self.SpPdRecList.currentItem().text()
+            newPathTemp=path+'/Speech_Data/PD/'+pathTemp
+            print(f"{newPathTemp} clicked")
+            fpdCount=0
+            for _, _, filenames in os.walk(newPathTemp):
+                if not len(filenames)==0:
+                    print(filenames)
+                    fpdCount+=len(filenames)
+                    for i in filenames:
+                        if i[len(i)-3:len(i)]=='wav':
+                            self.SpPdTnList.addItem(i[0:len(i)-4])
+                            print(i[0:len(i)-4])
+            
+            if fpdCount==0:
+                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+        else:
+           QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+    def onClickedViewSpCgTnBtn(self):
+        if self.SpCgRecList.selectedItems():
+            self.SpCgTnList.clear()
+            pathTemp=self.SpCgRecList.currentItem().text()
+            newPathTemp=path+'/Speech_Data/CG/'+pathTemp
+            print(f"{newPathTemp} clicked")
+            fcgCount=0
+            for _, _, filenames in os.walk(newPathTemp):
+                if not len(filenames)==0:
+                    print(filenames)
+                    fcgCount+=len(filenames)
+                    for i in filenames:
+                        if i[len(i)-3:len(i)]=='wav':
+                            self.SpCgTnList.addItem(i[0:len(i)-4])
+                            print(i[0:len(i)-4])
+            if fcgCount==0:
+                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+        else:
+           QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+    def onClickedViewResCG(self):
+        if self.SpCgTnList.selectedItems():
+            searchFileRoot=""
+            newPathTemp=path+'/Speech_Data/CG'
+            search=self.SpCgTnList.currentItem().text()
+            searchFn=search+".wav"
+            for root, _, filenames in os.walk(newPathTemp):
+                for i in filenames:
+                    if i==searchFn:
+                        searchFileRoot=root
+            print(searchFileRoot)
+            accessError=False
+            notOtherData=True
+            for root, _, filenames in os.walk(searchFileRoot):
+                for i in filenames:
+                    notOtherData=True
+                    fnName=(i.split('.'))[0]
+                    try:
+                        if fnName[len(fnName)-len(search):len(fnName)]==search:
+                            notOtherData=False
+                    except:
+                        accessError=True
+                        pass
+                    if i!=searchFn and i[len(i)-3:len(i)]!='wav' and notOtherData==False:
+                        try:
+                            subprocess.Popen(["notepad.exe", root+"/"+i])
+                        except:
+                            pass
+                    if accessError==True:
+                        QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+            
+            try:
+                snd = parselmouth.Sound(searchFileRoot+"\\"+searchFn)
+                self.plotViewer(snd,search)
+            except:
+                print("File Access Error")
+                QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+        else:
+            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+
+    def onClickedViewResPD(self):
+        if self.SpPdTnList.selectedItems():
+            searchFileRoot=""
+            newPathTemp=path+'/Speech_Data/PD'
+            search=self.SpPdTnList.currentItem().text()
+            searchFn=search+".wav"
+            for root, _, filenames in os.walk(newPathTemp):
+                for i in filenames:
+                    if i==searchFn:
+                        searchFileRoot=root
+            print(searchFileRoot)
+            accessError=False
+            notOtherData=True
+            for root, _, filenames in os.walk(searchFileRoot):
+                for i in filenames:
+                    notOtherData=True
+                    fnName=(i.split('.'))[0]
+                    try:
+                        if fnName[len(fnName)-len(search):len(fnName)]==search:
+                            notOtherData=False
+                    except:
+                        accessError=True
+                        pass
+                    if i!=searchFn and i[len(i)-3:len(i)]!='wav' and notOtherData==False:
+                        try:
+                            subprocess.Popen(["notepad.exe", root+"/"+i])
+                        except:
+                            pass
+                    if accessError==True:
+                        QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+            
+            try:
+                snd = parselmouth.Sound(searchFileRoot+"\\"+searchFn)
+                self.plotViewer(snd,search)
+            except:
+                print("File Access Error")
+                QtWidgets.QMessageBox.warning(self,"Warning","Some files could not be opened!\nMake sure they aren't opened elsewhere.", QtWidgets.QMessageBox.Ok)
+        else:
+            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
+
+    def plotViewer(self,snd,search):
+        sep.set()
+
+        def draw_spectrogram(spectrogram, dynamic_range=70):
+            X, Y = spectrogram.x_grid(), spectrogram.y_grid()
+            sg_db = 10 * np.log10(spectrogram.values)
+            plt.pcolormesh(X, Y, sg_db, vmin=sg_db.max() - dynamic_range, cmap='afmhot')
+            plt.ylim([spectrogram.ymin, spectrogram.ymax])
+            plt.xlabel("time [s]")
+            plt.ylabel("frequency [Hz]")
+
+        def draw_pitch(pitch):
+            pitch_values = pitch.selected_array['frequency']
+            pitch_values[pitch_values==0] = np.nan
+            plt.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='w')
+            plt.plot(pitch.xs(), pitch_values, 'o', markersize=2)
+            plt.grid(False)
+            plt.ylim(0, pitch.ceiling)
+            plt.ylabel("F0 [Hz]")
+
+        pitch = snd.to_pitch()
+        pre_emphasized_snd = snd.copy()
+        pre_emphasized_snd.pre_emphasize()
+        spectrogram = pre_emphasized_snd.to_spectrogram(window_length=0.03, maximum_frequency=8000)
+        plt.figure(num=search) 
+        plt.subplot(1,2,1)
+        plt.title('Speech Signal Representation')
+        plt.plot(snd.xs(), snd.values.T)
+        plt.xlim([snd.xmin, snd.xmax])
+        plt.xlabel("Time [s]")
+        plt.ylabel("Amplitude")
+        mplcursors.cursor(hover=True)
+
+        plt.subplot(1,2,2)
+        plt.title('Fundamental Frequency F0')
+        draw_spectrogram(spectrogram)
+        plt.twinx()
+        draw_pitch(pitch)
+        plt.xlim([snd.xmin, snd.xmax])
+        mplcursors.cursor(hover=True)
+
+
+        mng=plt.get_current_fig_manager()
+        mng.window.state("zoomed")
+        plt.draw()
+        plt.show()
+
+            
+
+
+
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
       super().__init__()
@@ -990,7 +1661,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(658, 580)
+        MainWindow.resize(640, 552)
         MainWindow.setWindowIcon(QtGui.QIcon('appRes/logo.ico'))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -1294,6 +1965,86 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(8)
         self.TestNameCombo.setFont(font)
         self.TestNameCombo.setObjectName("TestNameCombo")
+        self.spRepMainWin = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.spRepMainWin.setGeometry(QtCore.QRect(350, 330, 251, 91))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.spRepMainWin.setFont(font)
+        self.spRepMainWin.setFrameShape(QtWidgets.QFrame.Box)
+        self.spRepMainWin.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.spRepMainWin.setPlainText("")
+        self.spRepMainWin.setObjectName("spRepMainWin")
+        self.spRepMainWin.setReadOnly(True)
+        self.labelSpRep = QtWidgets.QLabel(self.centralwidget)
+        self.labelSpRep.setGeometry(QtCore.QRect(350, 300, 101, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.labelSpRep.setFont(font)
+        self.labelSpRep.setObjectName("labelSpRep")
+        self.spViewMoreBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.spViewMoreBtn.setGeometry(QtCore.QRect(520, 440, 75, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.spViewMoreBtn.setFont(font)
+        self.spViewMoreBtn.setObjectName("spViewMoreBtn")
+        self.getSpRepBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.getSpRepBtn.setGeometry(QtCore.QRect(512, 280, 91, 31))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.getSpRepBtn.setFont(font)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("appRes/refresh.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.getSpRepBtn.setIcon(icon)
+        self.getSpRepBtn.setObjectName("getSpRepBtn")
+        self.mgViewMoreBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.mgViewMoreBtn.setGeometry(QtCore.QRect(520, 220, 75, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.mgViewMoreBtn.setFont(font)
+        self.mgViewMoreBtn.setObjectName("mgViewMoreBtn")
+        self.getMgRepBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.getMgRepBtn.setGeometry(QtCore.QRect(512, 60, 91, 31))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.getMgRepBtn.setFont(font)
+        self.getMgRepBtn.setIcon(icon)
+        self.getMgRepBtn.setObjectName("getMgRepBtn")
+        self.labelMgRep = QtWidgets.QLabel(self.centralwidget)
+        self.labelMgRep.setGeometry(QtCore.QRect(350, 80, 101, 16))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.labelMgRep.setFont(font)
+        self.labelMgRep.setObjectName("labelMgRep")
+        self.mgRepMainWin = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.mgRepMainWin.setGeometry(QtCore.QRect(350, 110, 251, 91))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.mgRepMainWin.setFont(font)
+        self.mgRepMainWin.setFrameShape(QtWidgets.QFrame.Box)
+        self.mgRepMainWin.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.mgRepMainWin.setPlainText("")
+        self.mgRepMainWin.setReadOnly(True)
+        self.mgRepMainWin.setObjectName("mgRepMainWin")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 658, 21))
@@ -1339,6 +2090,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.actionNew_Project.triggered.connect(self.new_project)
         self.actionOpen_Project.triggered.connect(self.open_project)
+        self.spViewMoreBtn.clicked.connect(self.onClickedSpViewMoreBtn)
+        self.mgViewMoreBtn.clicked.connect(self.onClickedMgViewMoreBtn)
         self.actionExit.triggered.connect(self.close_application)
         self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.actionAbout.triggered.connect(self.dialogAbout)
@@ -1357,8 +2110,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         app.aboutToQuit.connect(self.exit_message)
         self.recordMG.clicked.connect(self.recordMGData)
         self.recordSpeech.setEnabled(False)
+        self.spViewMoreBtn.setEnabled(False)
+        self.getSpRepBtn.setEnabled(False)
+        self.getMgRepBtn.setEnabled(False)
+        self.mgViewMoreBtn.setEnabled(False)
         self.TestNameCombo.insertItems(0,['Arch.Guided Spiral','Repeat Letters','Copy Sentence','Switching Letters'])
         self.recordSpeech.clicked.connect(self.recordSP)
+        self.getSpRepBtn.clicked.connect(self.onClickedGetSpRepBtn)
+        self.getMgRepBtn.clicked.connect(self.onClickedGetMgRepBtn)
         self.radioControl2.toggled.connect(self.onClickedControl2)
         self.radioParkinson2.toggled.connect(self.onClickedParkinson2)
         self.WacExtStatus.setText("Extractor Stopped")
@@ -1379,6 +2138,98 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def dialogAbout(self):
      Ui_DialogAbout().exec_()
 
+    def onClickedMgViewMoreBtn(self):
+        Ui_DialogMgRepViewer().exec_()
+
+    def onClickedSpViewMoreBtn(self):
+        Ui_DialogSpeechRepViewer().exec_()
+    
+    def onClickedGetMgRepBtn(self):
+        global mgtesttypesCG
+        global mgtestNamesCG
+        global mgtesttypesPD
+        global mgtestNamesPD
+        mgtesttypesCG=[]
+        mgtestNamesCG=[]
+        mgtesttypesPD=[]
+        mgtestNamesPD=[]
+        pathTemp=path+'/'+'MG_Data'
+        if os.path.exists(pathTemp):
+            pathTemp=pathTemp+'/'+'CG'
+            if os.path.exists(pathTemp):
+                for _, dirnames, filenames in os.walk(pathTemp):
+                    if not len(dirnames)==0:
+                        mgtesttypesCG.extend(dirnames)
+                    if not len(filenames)==0:
+                        for i in filenames:
+                            if i[len(i)-3:len(i)]=='log':
+                                mgtestNamesCG.append(i[0:len(i)-4])
+                    print(dirnames)
+                    print(filenames)
+                print(f"\n\nResult : {mgtesttypesCG}  {mgtestNamesCG}\n\n")
+               
+            pathTemp=path+'/'+'MG_Data'+'/'+'PD'
+            if os.path.exists(pathTemp):
+                for _, dirnames, filenames in os.walk(pathTemp):
+                    if not len(dirnames)==0:
+                        mgtesttypesPD.extend(dirnames)
+                    if not len(filenames)==0:
+                        for i in filenames:
+                            if i[len(i)-3:len(i)]=='log':
+                                mgtestNamesPD.append(i[0:len(i)-4])
+                    print(dirnames)
+                    print(filenames)
+                print(f"\n\nResult : {mgtesttypesPD}  {mgtestNamesPD}\n\n")
+
+            self.mgRepMainWin.setPlainText(f"Found {len(mgtesttypesPD)} PD Records:\n\n{mgtesttypesPD}\n\nwith {len(mgtestNamesPD)} TestNames:\n\n{mgtestNamesPD}\n\nFound {len(mgtesttypesCG)} CG Records:\n\n{mgtesttypesCG}\n\nwith {len(mgtestNamesCG)} TestNames:\n\n{mgtestNamesCG}\n\n")           
+            self.mgViewMoreBtn.setEnabled(True)
+        else:
+            self.mgRepMainWin.setPlainText("No MG data found.")
+
+    def onClickedGetSpRepBtn(self):
+        global sprecNamesCG
+        global sptestNamesCG
+        global sprecNamesPD
+        global sptestNamesPD
+        sprecNamesCG=[]
+        sptestNamesCG=[]
+        sprecNamesPD=[]
+        sptestNamesPD=[]
+        pathTemp=path+'/'+'Speech_Data'
+        if os.path.exists(pathTemp):
+            pathTemp=pathTemp+'/'+'CG'
+            if os.path.exists(pathTemp):
+                for _, dirnames, filenames in os.walk(pathTemp):
+                    if not len(dirnames)==0:
+                        sprecNamesCG.extend(dirnames)
+                    if not len(filenames)==0:
+                        for i in filenames:
+                            if i[len(i)-3:len(i)]=='wav':
+                                sptestNamesCG.append(i[0:len(i)-4])
+                    print(dirnames)
+                    print(filenames)
+                print(f"\n\n{sprecNamesCG}  {sptestNamesCG}")
+               
+            pathTemp=path+'/'+'Speech_Data'+'/'+'PD'
+            if os.path.exists(pathTemp):
+                for _, dirnames, filenames in os.walk(pathTemp):
+                    if not len(dirnames)==0:
+                        sprecNamesPD.extend(dirnames)
+                    if not len(filenames)==0:
+                        for i in filenames:
+                            if i[len(i)-3:len(i)]=='wav':
+                                sptestNamesPD.append(i[0:len(i)-4])
+                    print(dirnames)
+                    print(filenames)
+                print(f"\n\n{sprecNamesPD}  {sptestNamesPD}")
+
+            
+            self.spRepMainWin.setPlainText(f"Found {len(sprecNamesPD)} PD Records:\n\n{sprecNamesPD}\n\nwith {len(sptestNamesPD)} TestNames:\n\n{sptestNamesPD}\n\nFound {len(sprecNamesCG)} CG Records:\n\n{sprecNamesCG}\n\nwith {len(sptestNamesCG)} TestNames:\n\n{sptestNamesCG}\n\n")
+            self.spViewMoreBtn.setEnabled(True)
+        else:
+            self.spRepMainWin.setPlainText("No Speech data found.")
+                
+       
     def btnstate(self,b):
         if b.text() == "Control":
             if b.isChecked() == False:
@@ -1489,6 +2340,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
               self.recordMG.setEnabled(True)
             if cFlagSpeech==True and (self.radioControl2.isChecked()==True or self.radioParkinson2.isChecked()==True):
                 self.recordSpeech.setEnabled(True)
+            self.getSpRepBtn.setEnabled(True)
+            self.getMgRepBtn.setEnabled(True)
     
 
     def open_project(self):
@@ -1517,11 +2370,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
               self.recordMG.setEnabled(True)
           if cFlagSpeech==True and (self.radioControl2.isChecked()==True or self.radioParkinson2.isChecked()==True):
               self.recordSpeech.setEnabled(True)
+          self.getSpRepBtn.setEnabled(True)
+          self.getMgRepBtn.setEnabled(True)
+        
+
+        print(path)
 
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "WaFex"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "PDFE"))
         self.label.setText(_translate("MainWindow", "Device Status"))
         self.label_2.setText(_translate("MainWindow", "Project Details"))
         self.label_3.setText(_translate("MainWindow", "Data Acquisition"))
@@ -1533,6 +2391,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioControl.setText(_translate("MainWindow", "Control"))
         self.radioParkinson.setText(_translate("MainWindow", "Parkinson\'s"))
         self.ProjName.setText(_translate("MainWindow", "No projects opened."))
+        self.labelSpRep.setText(_translate("MainWindow", "Record Report:"))
+        self.spViewMoreBtn.setText(_translate("MainWindow", "View More.."))
+        self.getSpRepBtn.setText(_translate("MainWindow", "Get Report"))
+        self.mgViewMoreBtn.setText(_translate("MainWindow", "View More.."))
+        self.getMgRepBtn.setText(_translate("MainWindow", "Get Report"))
+        self.labelMgRep.setText(_translate("MainWindow", "Record Report:"))
         self.recordMG.setText(_translate("MainWindow", "Record"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.TestNameCombo.setToolTip(_translate("MainWindow", "Select Type"))
@@ -1554,18 +2418,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def recordMGData(self):
             consent = QtWidgets.QMessageBox.question(self,"Confirmation","You will not be able to cancel later on!\nAre you sure to continue?",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             if consent==QtWidgets.QMessageBox.Yes:
-                Ui_DialogPlayInstruction().exec_()
-                global recordMGFlag
-                recordMGFlag=True
-                self.WacExtStatus.setText("Extractor Running")
-                self.recordMG.setEnabled(False)
-                self.actionNew_Project.setEnabled(False)
-                self.actionOpen_Project.setEnabled(False)
-                testname=self.TestNameCombo.currentText()
-                self.newThread = MGWorker(testname)
-                print(f'MG TestName: {testname}')
-                self.newThread.signal.connect(self.finished)
-                self.newThread.start() 
+                if Ui_DialogPlayInstruction().exec_()!=2:
+                    global recordMGFlag
+                    recordMGFlag=True
+                    self.WacExtStatus.setText("Extractor Running")
+                    self.recordMG.setEnabled(False)
+                    self.actionNew_Project.setEnabled(False)
+                    self.actionOpen_Project.setEnabled(False)
+                    testname=self.TestNameCombo.currentText()
+                    self.newThread = MGWorker(testname)
+                    print(f'MG TestName: {testname}')
+                    self.newThread.signal.connect(self.finished)
+                    self.newThread.start() 
             else:
                 consent = QtWidgets.QMessageBox.information(self,"Information","Record Cancelled.",QtWidgets.QMessageBox.Ok)            
              
@@ -1636,6 +2500,7 @@ if __name__ == "__main__":
         splash.showMessage("<h3><font color='white'>Loading module wave..</font></h3>", QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter, QtCore.Qt.black)
         print("Wave")
         import mplcursors
+        import csv
         import datetime
         import subprocess
         import os

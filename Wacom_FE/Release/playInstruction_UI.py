@@ -40,7 +40,18 @@ class Ui_Dialog(object):
         self.playInstBtn.setObjectName("playInstBtn")
         self.continueToRecordBtn = QtWidgets.QPushButton(Dialog)
         self.continueToRecordBtn.setGeometry(QtCore.QRect(274, 110, 81, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setBold(True)
+        font.setWeight(75)
+        self.continueToRecordBtn.setFont(font)
         self.continueToRecordBtn.setObjectName("continueToRecordBtn")
+        self.cancelRecord = QtWidgets.QPushButton(Dialog)
+        self.cancelRecord.setGeometry(QtCore.QRect(10, 110, 104, 23))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        self.cancelRecord.setFont(font)
+        self.cancelRecord.setObjectName("cancelRecord")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -50,6 +61,7 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label_choose.setText(_translate("Dialog", "Choose Instruction:"))
         self.continueToRecordBtn.setText(_translate("Dialog", "Continue"))
+        self.cancelRecord.setText(_translate("Dialog", "Terminate Record"))
 
 
 if __name__ == "__main__":

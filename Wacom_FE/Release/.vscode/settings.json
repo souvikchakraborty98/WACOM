@@ -2,7 +2,6 @@
     "python.pythonPath": "C:\\Program Files (x86)\\Python37-32\\python.exe",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "python.linting.lintOnSave": true,
     "git.ignoreLimitWarning": true
 
 }

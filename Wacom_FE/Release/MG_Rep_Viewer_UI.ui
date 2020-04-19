@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>708</width>
+    <height>566</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QListWidget" name="MgCgTnList">
+   <property name="geometry">
+    <rect>
+     <x>358</x>
+     <y>313</y>
+     <width>331</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="mgviewResPD">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>251</y>
+     <width>90</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>View Result..</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_MgPdTn">
+   <property name="geometry">
+    <rect>
+     <x>358</x>
+     <y>14</y>
+     <width>231</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>PD Testnames of Selected Record:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_MgCgTn">
+   <property name="geometry">
+    <rect>
+     <x>358</x>
+     <y>291</y>
+     <width>231</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>CG Testnames of Selected Record:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="mgviewResCG">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>530</y>
+     <width>90</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>View Result..</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="MgPdTnList">
+   <property name="geometry">
+    <rect>
+     <x>358</x>
+     <y>33</y>
+     <width>331</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="MgPdRecTypeList">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>33</y>
+     <width>251</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="MgPdRecTypeList_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>313</y>
+     <width>251</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="viewMgPdTnBtn">
+   <property name="geometry">
+    <rect>
+     <x>282</x>
+     <y>117</y>
+     <width>65</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>View
+Tests</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>appRes/right.ico</normaloff>appRes/right.ico</iconset>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="viewMgCgTnBtn">
+   <property name="geometry">
+    <rect>
+     <x>282</x>
+     <y>397</y>
+     <width>65</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>View
+Tests</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>appRes/right.ico</normaloff>appRes/right.ico</iconset>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_MgPdTt">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>13</y>
+     <width>241</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>PD Test-types of Selected Record:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_MgCgTt">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>290</y>
+     <width>231</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>CG Test-types of Selected Record:</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
