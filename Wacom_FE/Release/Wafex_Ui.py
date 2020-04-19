@@ -435,27 +435,44 @@ class playTestSoundWorker(QtCore.QThread):
     def run(self):    
         filename =self.Fname
         chunk = 1024  
-        wf = wave.open(filename, 'rb')
-        p = pyaudio.PyAudio()
+        self.wf = wave.open(filename, 'rb')
+        self.p = pyaudio.PyAudio()
         try:
-            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()), channels = wf.getnchannels(), rate = wf.getframerate(),output_device_index=OUTPUT_DEVICE_IND, output = True)
+            self.stream = self.p.open(format = self.p.get_format_from_width(self.wf.getsampwidth()), channels = self.wf.getnchannels(), rate = self.wf.getframerate(),output_device_index=OUTPUT_DEVICE_IND, output = True)
         except:
-            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()), channels = wf.getnchannels(), rate = wf.getframerate(), output = True)
-        data = wf.readframes(chunk)
+            self.stream = self.p.open(format = self.p.get_format_from_width(self.wf.getsampwidth()), channels = self.wf.getnchannels(), rate = self.wf.getframerate(), output = True)
+        data = self.wf.readframes(chunk)
         try:
             while data != b'':
-                stream.write(data)
-                data = wf.readframes(chunk)
+                self.stream.write(data)
+                data = self.wf.readframes(chunk)
         except:
             pass
         
-        wf.close()
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+        self.wf.close()
+        self.stream.stop_stream()
+        self.stream.close()
+        self.p.terminate()
         self.signal.emit("Stopped")
     
     def stop(self):
+        try:
+            self.wf.close()
+        except:
+            pass
+        try:
+            self.stream.stop_stream()
+        except:
+            pass
+        try:
+            self.stream.close()
+        except:
+            pass
+        try:
+            self.p.terminate()
+        except:
+            pass
+        self.signal.emit("Stopped")
         print("Wav player terminated.")
         self.terminate()
 
@@ -532,7 +549,7 @@ class Ui_DialogPreRecordedInst(QtWidgets.QDialog):
                         pathAudInstruction=os.path.dirname(fileName)
                         print(pathAudInstruction)
                         print(tempFn)
-                        shutil.copy(fileName,'appRes/')
+                        shutil.copy(fileName,'appRes/recordings/')
                         self.audioList.addItem(tempFn)
                         print("Item Replaced")
                     except Exception as e:
@@ -544,7 +561,7 @@ class Ui_DialogPreRecordedInst(QtWidgets.QDialog):
                     pathAudInstruction=os.path.dirname(fileName)
                     print(pathAudInstruction)
                     print(tempFn)
-                    shutil.copy(fileName,'appRes/')
+                    shutil.copy(fileName,'appRes/recordings/')
                     self.audioList.addItem(tempFn)
                     audioListFile.append(tempFn)
                     with open('appRes/store.dat', 'wb') as f:
@@ -566,8 +583,8 @@ class Ui_DialogPreRecordedInst(QtWidgets.QDialog):
                     audioListFile.remove(currentText)
                     with open('appRes/store.dat', 'wb') as f:
                         pickle.dump(audioListFile, f)
-                    if os.path.exists(f"appRes/{currentText}"):
-                         os.remove(f"appRes/{currentText}")
+                    if os.path.exists(f"appRes/recordings/{currentText}"):
+                         os.remove(f"appRes/recordings/{currentText}")
                     print("Removed from list")
                 except Exception as e:
                     print(f"Value error: {e}")
@@ -648,21 +665,30 @@ class Ui_DialogPlayInstruction(QtWidgets.QDialog):
         self.cancelRecord.setText(_translate("Dialog", "Terminate Record"))
 
     def onClickedplayInstBtn(self):
+        self.playInstBtn.setEnabled(False)
         global instructionPlaying
         if not instructionPlaying:           
             instructionPlaying=True
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap("appRes/Stop.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.playInstBtn.setIcon(icon)
-            self.newThread = playTestSoundWorker(f'appRes/{self.chooseInstCombo.currentText()}')
+            self.newThread = playTestSoundWorker(f'appRes/recordings/{self.chooseInstCombo.currentText()}')
             self.newThread.signal.connect(self.instructionPlayerSignals)
-            self.newThread.start()
+            try:
+                self.newThread.start()
+            except:
+                pass
+            self.playInstBtn.setEnabled(True)
         else:
-            self.newThread.stop()
+            try:
+                self.newThread.stop()
+            except:
+                pass
             instructionPlaying=False
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap("appRes/Play.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.playInstBtn.setIcon(icon)
+            self.playInstBtn.setEnabled(True)
 
 
     def instructionPlayerSignals(self):
@@ -677,10 +703,13 @@ class Ui_DialogPlayInstruction(QtWidgets.QDialog):
         global instructionPlaying
         close = QtWidgets.QMessageBox.question(self,"Confirmation","Are you sure you want to stop playing instruction?\nControl will pass to recorder.",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if close == QtWidgets.QMessageBox.Yes:
-            super(Ui_DialogPlayInstruction, self).closeEvent(evnt)
             if instructionPlaying:
                 instructionPlaying=False
-                self.newThread.stop()
+                try:
+                    self.newThread.stop()
+                except:
+                    pass
+            super(Ui_DialogPlayInstruction, self).closeEvent(evnt)
         else:
             evnt.ignore()
 
@@ -1178,7 +1207,7 @@ class Ui_DialogMgRepViewer(QtWidgets.QDialog):
                             print(i[0:len(i)-4])
             
             if fpdCount==0:
-                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.information(self,"Information","No tests found.\nTry refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
         else:
            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
 
@@ -1199,7 +1228,7 @@ class Ui_DialogMgRepViewer(QtWidgets.QDialog):
                             self.MgCgTnList.addItem(i[0:len(i)-4])
                             print(i[0:len(i)-4])
             if fcgCount==0:
-                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.information(self,"Information","No tests found.\nTry refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
         else:
            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
 
@@ -1498,7 +1527,7 @@ class Ui_DialogSpeechRepViewer(QtWidgets.QDialog):
                             print(i[0:len(i)-4])
             
             if fpdCount==0:
-                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.information(self,"Information","No tests found.\nTry refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
         else:
            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
 
@@ -1518,7 +1547,7 @@ class Ui_DialogSpeechRepViewer(QtWidgets.QDialog):
                             self.SpCgTnList.addItem(i[0:len(i)-4])
                             print(i[0:len(i)-4])
             if fcgCount==0:
-                QtWidgets.QMessageBox.information(self,"Information","Try refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.information(self,"Information","No tests found.\nTry refreshing via \"Get Report\" in the home page!", QtWidgets.QMessageBox.Ok)
         else:
            QtWidgets.QMessageBox.information(self,"Information","Nothing Selected!", QtWidgets.QMessageBox.Ok)
 
@@ -2104,7 +2133,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             with open('appRes/store.dat', 'rb') as f:
                     audioListFile = pickle.load(f)
         except:
+            print("Fresh Install")
             pass
+
+        if not os.path.exists("appRes/recordings/"):
+            os.makedirs("appRes/recordings/")
 
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         app.aboutToQuit.connect(self.exit_message)
@@ -2208,7 +2241,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 sptestNamesCG.append(i[0:len(i)-4])
                     print(dirnames)
                     print(filenames)
-                print(f"\n\n{sprecNamesCG}  {sptestNamesCG}")
+                print(f"\n\nResult : {sprecNamesCG}  {sptestNamesCG}\n\n")
                
             pathTemp=path+'/'+'Speech_Data'+'/'+'PD'
             if os.path.exists(pathTemp):
@@ -2221,7 +2254,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 sptestNamesPD.append(i[0:len(i)-4])
                     print(dirnames)
                     print(filenames)
-                print(f"\n\n{sprecNamesPD}  {sptestNamesPD}")
+                print(f"\n\nResult : {sprecNamesPD}  {sptestNamesPD}\n\n")
 
             
             self.spRepMainWin.setPlainText(f"Found {len(sprecNamesPD)} PD Records:\n\n{sprecNamesPD}\n\nwith {len(sptestNamesPD)} TestNames:\n\n{sptestNamesPD}\n\nFound {len(sprecNamesCG)} CG Records:\n\n{sprecNamesCG}\n\nwith {len(sptestNamesCG)} TestNames:\n\n{sptestNamesCG}\n\n")
@@ -2252,6 +2285,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             close2 = QtWidgets.QMessageBox.information(self,"Info","Data saved to project folder.\nFor folder structure refer documentation.", QtWidgets.QMessageBox.Ok)
             if close2 == QtWidgets.QMessageBox.Ok:
                 sys.exit()
+
     def exit_message(self):
         close = QtWidgets.QMessageBox.information(self,"Info","Data saved to project folder.\nFor folder structure refer documentation.", QtWidgets.QMessageBox.Ok)
         if close == QtWidgets.QMessageBox.Ok:
