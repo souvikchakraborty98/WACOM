@@ -46,7 +46,8 @@ sfn="dataDump"+"_for_"+x+".log"
 
 path0 = os.path.dirname(os.path.abspath(__file__))+"\\dataDump"
 
-path=path+"\\"+search[0:-4]
+pathx=path+"\\CG\\"+search[0:-4]
+pathy=path+"\\PD\\"+search[0:-4]
 
 if not os.path.exists(path0):
     os.makedirs(path0)
@@ -54,12 +55,15 @@ ops=os.path.join(path0, sfn)
 
 
 try:
-  snd = parselmouth.Sound(os.path.join(path,search))
+  snd = parselmouth.Sound(os.path.join(pathx,search))
 except:
-      print("Could not read audio!\n")
-      print("Press any key to exit")
-      getch()
-      exit()
+      try:
+         snd = parselmouth.Sound(os.path.join(pathy,search))
+      except:
+         print("Could not read audio!\n")
+         print("Press any key to exit")
+         getch()
+         exit()
 
 sound = parselmouth.Sound(snd) 
 harmonicity = parselmouth.praat.call(sound, "To Harmonicity (cc)", 0.01, 75, 0.1, 1.0)
