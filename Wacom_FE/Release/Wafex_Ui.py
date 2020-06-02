@@ -485,7 +485,7 @@ class Ui_DialogPreRecordedInst(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(507, 399)
-        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.ico'))
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Dialog.setFixedSize(Dialog.size())
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
@@ -571,7 +571,7 @@ class Ui_DialogPreRecordedInst(QtWidgets.QDialog):
                     consent = QtWidgets.QMessageBox.warning(self,"Warning","An Error occured! Please ensure resources are not being used by other applications.",QtWidgets.QMessageBox.Ok)
                     print(e)
                     pass
-    
+            
     def onClickedDeleteItemsBtn(self):
         if self.audioList.currentItem():
             currentText=str(self.audioList.currentItem().text())
@@ -764,13 +764,13 @@ class Ui_DialogAbout(QtWidgets.QDialog):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Copyright 2020 <a href=\"https://github.com/souvikchakraborty98/WACOM/blob/master/README.md\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">Souvik Chakraborty</span></a></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span></p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; color:#444444; background-color:#fcfcfc;\">Copyright 2020 </span> <a href=\"https://github.com/souvikchakraborty98/WACOM/blob/master/README.md\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Souvik Chakraborty</span></a></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:25px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#fcfcfc;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; font-weight:600; color:#444444; background-color:#fcfcfc;\">TEST COPY</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:25px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#fcfcfc;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; color:#444444; background-color:#fcfcfc;\">Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:25px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#fcfcfc;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; color:#444444; background-color:#fcfcfc;\">1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:25px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#fcfcfc;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; color:#444444; background-color:#fcfcfc;\">2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:25px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#fcfcfc;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; color:#444444; background-color:#fcfcfc;\">3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:25px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#fcfcfc;\"><span style=\" font-family:\'Open Sans\'; font-size:8pt; color:#444444; background-color:#fcfcfc;\">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span></p></body></html>"))
 
 
 class Ui_DialogAudioDevSel(QtWidgets.QDialog):
@@ -783,7 +783,7 @@ class Ui_DialogAudioDevSel(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(400, 300)
-        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.ico'))
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Dialog.setFixedSize(Dialog.size())
         self.buttonBox_audio = QtWidgets.QDialogButtonBox(Dialog)
@@ -962,7 +962,7 @@ class Ui_DialogRecAudio(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("DialogRecAudio")
         Dialog.resize(331, 380)
-        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.ico'))
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Dialog.setFixedSize(Dialog.size())
         self.updateThresholdBtn = QtWidgets.QPushButton(Dialog)
@@ -1390,7 +1390,7 @@ class Ui_DialogSpeechRepViewer(QtWidgets.QDialog):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(678, 564)
-        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.png'))
+        Dialog.setWindowIcon(QtGui.QIcon('appRes/mic.ico'))
         Dialog.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Dialog.setFixedSize(Dialog.size())
         self.SpCgRecList = QtWidgets.QListWidget(Dialog)
