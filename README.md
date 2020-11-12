@@ -4,7 +4,7 @@ The aim is to extract data from a person's digital handwriting  from a *commerci
 
 ## 1.1 AIM
 
-To design a software prototype which will monitor the various parameters associated with handwriting data. This project’s purpose is to create a windowsbased software capable of capturing handwriting data through capable hardware.
+To design a software prototype which will monitor the various parameters associated with handwriting data. This project’s purpose is to create a windows based software capable of capturing handwriting data through capable hardware.
 The software shall be proprietary and will work with a pen-digitizer hardware setup of the manufacturer: [“WACOM”](https://www.wacom.com/). The recorded data shall be stored locally on the system running the software. This recorded data sets to be in CSV and text formats. The point of this work was to set up a dependable PC based winding portraying technique for evaluation of the seriousness of the malady. This examination has
 researched the elements of portraying a winding to recognize solid subjects and PD patients with various dimensions of seriousness and proposes another component
 with more grounded relationship with the seriousness of the illness.
