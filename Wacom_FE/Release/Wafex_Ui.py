@@ -1,6 +1,5 @@
 #TODO convert to modules
 
-import PyQt5
 from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib import pyplot as plt
 
